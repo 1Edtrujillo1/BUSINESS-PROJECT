@@ -1,0 +1,26 @@
+{
+    "Text": [
+        "Things to do",
+        "Doing",
+        "Done",
+        "kk"
+    ],
+    "Status": [
+        "warning",
+        "info",
+        "success",
+        "info"
+    ],
+    "Href": [
+        "https://trello.com/b/vUkyz2V3/work-to-do",
+        "https://trello.com/b/vUkyz2V3/work-to-do",
+        "https://trello.com/b/vUkyz2V3/work-to-do",
+        "https://trello.com/b/vUkyz2V3/work-to-do"
+    ],
+    "Icon": [
+        "info",
+        "info",
+        "info",
+        "info"
+    ]
+}
