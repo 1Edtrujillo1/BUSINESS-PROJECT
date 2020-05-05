@@ -24,7 +24,8 @@ header <- dashboardHeaderPlus(
       radioButtons(
         inputId = "basemenu",
         label = "Menu",
-        choices = c("Home", "Personal Information", "Additional Information"))
+        choices = c("Home", "Personal Information", "Additional Information"),
+        selected = "Home")
     ))
 )
 
