@@ -82,7 +82,7 @@ body <- dashboardBody(
         box(
           title = "Additional Information",
           status = "primary"
-      )
+        )
       ))),
   
   # Taggle sidebar information ----------------------------------------------
@@ -102,11 +102,73 @@ body <- dashboardBody(
             "Modify1"
     ),
     
-    # Statistical Distributions 
+    ####### Statistical Distributions ##########################
+    
+    ### Discrete Distributions ##################
     
     tabItem(tabName = "SDiscrete",
-            "Modify2"
+            #Binomial
+            conditionalPanel(condition = "input.discrete == 'Binomial'",
+                             tabsetPanel(
+                               tabPanel(title = "Dataset",
+                                        DT::DTOutput("dt_Binomial")),
+                               tabPanel(title = "Plot",
+                                        "k2")
+                             )),
+            #Geometric (I)
+            conditionalPanel(condition = "input.discrete == 'Geometric' && input.geometric == 'geometric1'",
+                             tabsetPanel(
+                               tabPanel(title = "Dataset",
+                                        DT::DTOutput("dt_geometric1")),
+                               tabPanel(title = "Plot",
+                                        "k4")
+                             )),
+            #Geometric (II)
+            conditionalPanel(condition = "input.discrete == 'Geometric' && input.geometric == 'geometric2'",
+                             tabsetPanel(
+                               tabPanel(title = "Dataset",
+                                        DT::DTOutput("dt_geometric2")),
+                               tabPanel(title = "Plot",
+                                        "k6")
+                             )),
+            #Negative Binomial (I)
+            conditionalPanel(condition = "input.discrete == 'Negative Binomial' && input.negativebinomial == 'negativebinomial1'",
+                             tabsetPanel(
+                               tabPanel(title = "Dataset",
+                                        DT::DTOutput("dt_negativebinomial1")),
+                               tabPanel(title = "Plot",
+                                        "k8")
+                             )),
+            #Negative Binomial (II)
+            conditionalPanel(condition = "input.discrete == 'Negative Binomial' && input.negativebinomial == 'negativebinomial2'",
+                             tabsetPanel(
+                               tabPanel(title = "Dataset",
+                                        DT::DTOutput("dt_negativebinomial2")),
+                               tabPanel(title = "Plot",
+                                        "k10")
+                             )),
+            #Hyper-Geometric
+            conditionalPanel(condition = "input.discrete == 'Hyper-Geometric'",
+                             tabsetPanel(
+                               tabPanel(title = "Dataset",
+                                        DT::DTOutput("dt_HyperGeometric"),
+                                        "k11"),
+                               tabPanel(title = "Plot",
+                                        "k12")
+                             )),
+            #Poisson
+            conditionalPanel(condition = "input.discrete == 'Poisson'",
+                             tabsetPanel(
+                               tabPanel(title = "Dataset",
+                                        DT::DTOutput("dt_Poisson")),
+                               tabPanel(title = "Plot",
+                                        "k14")
+                             ))
+            
     ),
+    
+    ### Continous Distributions ##################
+    
     tabItem(tabName = "SDcontinous",
             "Modify2.1"
     ),

@@ -38,7 +38,8 @@ rightsidebar <- rightSidebar(
                      selectInput(inputId = "discrete", label = "Distribution", 
                                  choices = c("Binomial", "Geometric", "Negative Binomial",
                                              "Hyper-Geometric", "Poisson"),
-                                 multiple = FALSE),
+                                 multiple = FALSE,
+                                 selected = NULL),
                      
                      hr(), #Add a horizontal line for separation
                      
