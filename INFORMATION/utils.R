@@ -79,28 +79,28 @@ discrete_distribution <- function(distribution_choice = c("binomial", "hypergeom
   
   
   if(distribution_choice %in% c("binomial", "hypergeometric", "poisson", "negative1"))
-    quantile_values_list <- quantile_values_list$upper_tail:quantile_values_list$under_tail
+    quantile_values <- quantile_values_list$upper_tail:quantile_values_list$under_tail
   else if(distribution_choice == "geometric1")
-    quantile_values_list <- 0:quantile_values_list$under_tail
-  else if(distribution_choice == "geometric2")
-    quantile_values_list <- 1:quantile_values_list$under_tail
-  else if(distribution_choice == "negative2")
-    quantile_values_list <- n_dist:quantile_values_list$under_tail
+    quantile_values <- 0:quantile_values_list$under_tail
+  else if(distribution_choice == "geometric2") #success
+    quantile_values <- 1:(quantile_values_list$under_tail+1)
+  else if(distribution_choice == "negative2") #success
+    quantile_values <- n_dist:(quantile_values_list$under_tail+n_dist)
   
-  quantile_values_list <- data.table(random_variable = quantile_values_list)
+  quantile_values <- data.table(random_variable = quantile_values)
   
   #copy() to no affect the original dataset and use the if conditions to define the different form of the variable
   
   if(tail_distribution == "under_x") 
     df_func_probability <- 
-    copy(quantile_values_list)[,id:=ifelse(random_variable <= x_dist, "inside", "outside")]
+    copy(quantile_values)[,id:=ifelse(random_variable <= x_dist, "inside", "outside")]
   else if(tail_distribution == "above_x")
     df_func_probability <- 
-    copy(quantile_values_list)[,id:=ifelse(random_variable > x_dist, "inside", "outside")]
+    copy(quantile_values)[,id:=ifelse(random_variable > x_dist, "inside", "outside")]
   else if(tail_distribution == "interval") 
     df_func_probability <- 
-    copy(quantile_values_list)[,id:=ifelse(random_variable >= a_dist & random_variable <= b_dist,
-                                           "inside", "outside")]
+    copy(quantile_values)[,id:=ifelse(random_variable >= a_dist & random_variable <= b_dist,
+                                      "inside", "outside")]
   
   #do.call pass list to argument function 
   options(scipen = 999) #avoid scientific notation for the probability
@@ -114,11 +114,17 @@ discrete_distribution <- function(distribution_choice = c("binomial", "hypergeom
   else if(distribution_choice == "poisson") 
     df_func_probability[,probability:= do.call(dpois, args = list(x = random_variable) %>% append(distribution_args$poisson_args))] %>% 
     return()
-  else if(distribution_choice %in% c("geometric1", "geometric2"))
+  else if(distribution_choice == "geometric1")
     df_func_probability[,probability:= do.call(dgeom, args = list(x = random_variable) %>% append(distribution_args$geometric_args))] %>% 
     return()
-  else if(distribution_choice %in% c("negative1", "negative2"))
+  else if(distribution_choice == "geometric2")
+    df_func_probability[,probability:= do.call(dgeom, args = list(x = 0:quantile_values_list$under_tail) %>% append(distribution_args$geometric_args))] %>% 
+    return()
+  else if(distribution_choice == "negative1")
     df_func_probability[,probability:= do.call(dnbinom, args = list(x = random_variable) %>% append(distribution_args$negative_args))] %>% 
+    return()
+  else if(distribution_choice  == "negative2")
+    df_func_probability[,probability:=do.call(dnbinom, args = list(x = 0:quantile_values_list$under_tail) %>% append(distribution_args$negative_args))] %>% 
     return()
   
   df_func_probability <- df_func_probability[,id := toupper(id)] %>% 
