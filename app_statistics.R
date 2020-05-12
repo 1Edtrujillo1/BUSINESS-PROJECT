@@ -2,7 +2,7 @@
 library(purrr)
 
 map(c("shiny", "shinydashboard", "dashboardthemes", "shinydashboardPlus", "shinyWidgets", "mixdist","DT",
-      "jsonlite", "data.table", "dplyr", "bit64", "stringr", "scales"), 
+      "jsonlite", "data.table", "dplyr", "bit64", "stringr", "scales", "ggplot2", "plotly"), 
     require, character.only = TRUE)
 
 map(c("header.R", "sidebar.R", "body.R", "rightsidebar.R",
@@ -41,24 +41,26 @@ server <- function(input, output) {
   #'@param discrete_reactive reactive discrete datasets
   #'@return beautiful DT with specific arguments 
   dataset_discrete_reactive <- function(discrete_reactive){
-    
-    factors_vars <- c("RANDOM VARIABLE", "ID")
-    
-    df <- discrete_reactive[,(factors_vars):=lapply(.SD, as.factor), .SDcols = factors_vars] %>% 
-      .[,PROBABILITY := scales::percent(x = PROBABILITY, accuracy = 0.00000001)]
-    
-    DT::datatable(data = df, 
-                  style = 'bootstrap', #theme of the datatable
-                  
-                  filter = list(position = 'top', clear = FALSE),
-                  
-                  options = list(
+      
+      df <- copy(discrete_reactive) %>% setnames(old = "RANDOM_VARIABLE", new = "RANDOM VARIABLE")
+      
+      factors_vars <- c("RANDOM VARIABLE", "ID")
+      
+      df[,(factors_vars):=lapply(.SD, as.factor), .SDcols = factors_vars] %>% 
+        .[,PROBABILITY := scales::percent(x = PROBABILITY, accuracy = 0.00000001)]
+      
+      DT::datatable(data = df, 
+                    style = 'bootstrap', #theme of the datatable
                     
-                    autoWidth = TRUE,
+                    filter = list(position = 'top', clear = FALSE),
                     
-                    pageLength = binomial_reactive()[,.N, by = "ID"] %>% 
-                      .[,.(mean(N, na.rm = TRUE))] %>% as.integer())
-    )
+                    options = list(
+                      
+                      autoWidth = TRUE,
+                      
+                      pageLength = binomial_reactive()[,.N, by = "ID"] %>% 
+                        .[,.(mean(N, na.rm = TRUE))] %>% as.integer())
+      )  
   }
   
   #Binomial
@@ -81,7 +83,9 @@ server <- function(input, output) {
                             n_dist = input$n_binomial, p_dist = input$p_binomial, 
                             a_dist = input$a_binomial, b_dist = input$b_binomial) %>% return()
   })
+  
   output$dt_Binomial <- DT::renderDT({dataset_discrete_reactive(discrete_reactive = binomial_reactive())})
+  output$plot_Binomial <- plotly::renderPlotly({discrete_plot(df_discrete = binomial_reactive())})
   
   #Geometric (I)
   geometric1_reactive <- reactive({
@@ -104,6 +108,7 @@ server <- function(input, output) {
                             a_dist = input$a_geometric1, b_dist = input$b_geometric1)
   })
   output$dt_geometric1 <- DT::renderDT({dataset_discrete_reactive(discrete_reactive = geometric1_reactive())})
+  output$plot_geometric1 <- plotly::renderPlotly({discrete_plot(df_discrete = geometric1_reactive())})
   
   #Geometric (II)
   geometric2_reactive <- reactive({
@@ -126,6 +131,7 @@ server <- function(input, output) {
                             a_dist = input$a_geometric2, b_dist = input$b_geometric2)
   })
   output$dt_geometric2 <- DT::renderDT({dataset_discrete_reactive(discrete_reactive = geometric2_reactive())})
+  output$plot_geometric2 <- plotly::renderPlotly({discrete_plot(df_discrete = geometric2_reactive())})
   
   #Negative Binomial (I)
   negativebinomial1_reactive <- reactive({
@@ -148,6 +154,7 @@ server <- function(input, output) {
                             a_dist = input$a_negativebinomial1, b_dist = input$b_negativebinomial1)
   })
   output$dt_negativebinomial1 <- DT::renderDT({dataset_discrete_reactive(discrete_reactive = negativebinomial1_reactive())})
+  output$plot_negativebinomial1 <- plotly::renderPlotly({discrete_plot(df_discrete = negativebinomial1_reactive())}) 
   
   #Negative Binomial (II)
   negativebinomial2_reactive <- reactive({
@@ -170,6 +177,7 @@ server <- function(input, output) {
                             a_dist = input$a_negativebinomial2, b_dist = input$b_negativebinomial2)
   })
   output$dt_negativebinomial2 <- DT::renderDT({dataset_discrete_reactive(discrete_reactive = negativebinomial2_reactive())})
+  output$plot_negativebinomial2 <- plotly::renderPlotly({discrete_plot(df_discrete = negativebinomial2_reactive())})
   
   #Hyper-Geometric
   hypergeometric_reactive <- reactive({
@@ -195,6 +203,7 @@ server <- function(input, output) {
                             a_dist = input$a_hypergeometric, b_dist = input$b_hypergeometric)
   })
   output$dt_HyperGeometric <- DT::renderDT({dataset_discrete_reactive(discrete_reactive = hypergeometric_reactive())})
+  output$plot_HyperGeometric <- plotly::renderPlotly({discrete_plot(df_discrete = hypergeometric_reactive())})
   
   #Poisson
   poisson_reactive <- reactive({
@@ -217,6 +226,7 @@ server <- function(input, output) {
                             a_dist = input$a_poisson, b_dist = input$b_poisson)
   })
   output$dt_Poisson <- DT::renderDT({dataset_discrete_reactive(discrete_reactive = poisson_reactive())})
+  output$plot_Poisson <- plotly::renderPlotly({discrete_plot(df_discrete = poisson_reactive())})
   
 }
 

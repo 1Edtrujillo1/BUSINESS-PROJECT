@@ -75,7 +75,7 @@ discrete_distribution <- function(distribution_choice = c("binomial", "hypergeom
                                            )
                                 ) %>% map("result") %>% discard(~is.null(.x))
                               }
-  ) %>% set_names(c("upper_tail", "under_tail")) %>% map(~.x[[str_extract(string = distribution_choice, pattern = "[^\\d]*")]])
+  ) %>% set_names(c("upper_tail", "under_tail")) %>% map(~.x[[str_extract(string = distribution_choice, pattern = "[^\\d]*")]]) #everything except a 0 or more digit
   
   
   if(distribution_choice %in% c("binomial", "hypergeometric", "poisson", "negative1"))
@@ -123,13 +123,41 @@ discrete_distribution <- function(distribution_choice = c("binomial", "hypergeom
   
   df_func_probability <- df_func_probability[,id := toupper(id)] %>% 
     set_names(toupper(names(df_func_probability))) %>% 
-    setnames(old = "RANDOM_VARIABLE", new = "RANDOM VARIABLE") %>% 
     return()
   
 }
 
+#'@description Create a plot of the probability of each x of X (funcion de masa de probabilidad)
+#'to observe the behavior of the Distribution Function F(x)
+#'@param df_discrete
+#'@return plot of the discrete distribution
 
-
+discrete_plot <- function(df_discrete){
+  
+  plot <- df_discrete %>% ggplot(aes(x = as.factor(RANDOM_VARIABLE), y = PROBABILITY, fill = ID)) + 
+    geom_col(alpha = 0.8) + 
+    geom_text(aes(label = round(PROBABILITY, digits = 3), #text the probability in each bar
+                  y = PROBABILITY + 0.005,),
+              colour = "white",
+              position = position_dodge(0.9),
+              size = 3, # size of text
+              vjust = 0) + 
+    theme_minimal() +
+    labs(x = "X", 
+         y = "Probability Function", 
+         title = toupper(str_extract(string = deparse(substitute(df_discrete)), 
+                                     pattern = "(\\w*)(?=\\d\\_)|(\\w*)(?=\\_)"))) + #all before digit_ or _
+    theme(plot.title = element_text(face = "italic", hjust = 0.5),
+          axis.title = element_text(face = "italic"), 
+          axis.ticks = element_line(color = "red"),
+          axis.text = element_text(colour = "white"),
+          text = element_text(colour = "white")) 
+  
+  plotly::ggplotly(plot) %>% 
+    layout(plot_bgcolor='transparent', paper_bgcolor='transparent') %>% 
+    return()
+  
+}
 
 
 

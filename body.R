@@ -113,7 +113,7 @@ body <- dashboardBody(
                                tabPanel(title = "Dataset",
                                         DT::DTOutput("dt_Binomial")),
                                tabPanel(title = "Plot",
-                                        "k2")
+                                        plotly::plotlyOutput("plot_Binomial"))
                              )),
             #Geometric (I)
             conditionalPanel(condition = "input.discrete == 'Geometric' && input.geometric == 'geometric1'",
@@ -121,7 +121,7 @@ body <- dashboardBody(
                                tabPanel(title = "Dataset",
                                         DT::DTOutput("dt_geometric1")),
                                tabPanel(title = "Plot",
-                                        "k4")
+                                        plotly::plotlyOutput("plot_geometric1"))
                              )),
             #Geometric (II)
             conditionalPanel(condition = "input.discrete == 'Geometric' && input.geometric == 'geometric2'",
@@ -129,7 +129,7 @@ body <- dashboardBody(
                                tabPanel(title = "Dataset",
                                         DT::DTOutput("dt_geometric2")),
                                tabPanel(title = "Plot",
-                                        "k6")
+                                        plotly::plotlyOutput("plot_geometric2"))
                              )),
             #Negative Binomial (I)
             conditionalPanel(condition = "input.discrete == 'Negative Binomial' && input.negativebinomial == 'negativebinomial1'",
@@ -137,7 +137,7 @@ body <- dashboardBody(
                                tabPanel(title = "Dataset",
                                         DT::DTOutput("dt_negativebinomial1")),
                                tabPanel(title = "Plot",
-                                        "k8")
+                                        plotly::plotlyOutput("plot_negativebinomial1"))
                              )),
             #Negative Binomial (II)
             conditionalPanel(condition = "input.discrete == 'Negative Binomial' && input.negativebinomial == 'negativebinomial2'",
@@ -145,16 +145,15 @@ body <- dashboardBody(
                                tabPanel(title = "Dataset",
                                         DT::DTOutput("dt_negativebinomial2")),
                                tabPanel(title = "Plot",
-                                        "k10")
+                                        plotly::plotlyOutput("plot_negativebinomial2"))
                              )),
             #Hyper-Geometric
             conditionalPanel(condition = "input.discrete == 'Hyper-Geometric'",
                              tabsetPanel(
                                tabPanel(title = "Dataset",
-                                        DT::DTOutput("dt_HyperGeometric"),
-                                        "k11"),
+                                        DT::DTOutput("dt_HyperGeometric")),
                                tabPanel(title = "Plot",
-                                        "k12")
+                                        plotly::plotlyOutput("plot_HyperGeometric"))
                              )),
             #Poisson
             conditionalPanel(condition = "input.discrete == 'Poisson'",
@@ -162,7 +161,7 @@ body <- dashboardBody(
                                tabPanel(title = "Dataset",
                                         DT::DTOutput("dt_Poisson")),
                                tabPanel(title = "Plot",
-                                        "k14")
+                                        plotly::plotlyOutput("plot_Poisson"))
                              ))
             
     ),
