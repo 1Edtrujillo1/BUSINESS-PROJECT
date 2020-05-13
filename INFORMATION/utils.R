@@ -151,8 +151,8 @@ discrete_plot <- function(df_discrete){
     theme_minimal() +
     labs(x = "X", 
          y = "Probability Function", 
-         title = toupper(str_extract(string = deparse(substitute(df_discrete)), 
-                                     pattern = "(\\w*)(?=\\d\\_)|(\\w*)(?=\\_)"))) + #all before digit_ or _
+         title = toupper(str_extract(string = deparse(substitute(df_discrete)), #deparse(substitute()) nonestandar evaluation to bring the name of the dataset as a character vector
+                                     pattern = "(?<=my_)\\w*(\\w*)(?=\\d\\_)|(?<=my_)\\w*(\\w*)(?=\\_)"))) + #all after my_ and before digit_ or _
     theme(plot.title = element_text(face = "italic", hjust = 0.5),
           axis.title = element_text(face = "italic"), 
           axis.ticks = element_line(color = "red"),
@@ -165,6 +165,57 @@ discrete_plot <- function(df_discrete){
   
 }
 
+#'@description
+#'@param df_discrete
+#'@return 
+
+name <- function(distribution_choice = c("binomial", "hypergeometric", "poisson", 
+                                         "geometric1", "geometric2", "negative1", 
+                                         "negative2"), 
+                 tail_distribution = c("under_x", "above_x", "interval"), 
+                 n_dist = NULL, p_dist = NULL, 
+                 lambda_dist = NULL, M_dist = NULL,
+                 N_dist = NULL, x_dist = NULL, 
+                 a_dist = NULL, b_dist = NULL) {  
+  
+  if(distribution_choice == "binomial"){
+    distribution <- "\\(Bin \\)"
+    arguments <- paste0("\\(n= \\)", n_dist, "\\(,p= \\)" , p_dist, sep = " ")
+  }
+  
+  else if(distribution_choice == "hypergeometric"){
+    distribution <- "\\(HG \\)"
+    arguments <- paste0("\\(n= \\)", n_dist, "\\(,N= \\)", N_dist, "\\(,M= \\)", M_dist, sep = " ")
+  }
+  
+  else if(distribution_choice == "poisson"){
+    distribution <- "\\(Pois \\)"
+    arguments <- paste0("\\(\\lambda= \\)", lambda_dist, sep = " ")
+  }
+  
+  else if(distribution_choice %in% c("geometric1", "geometric2")){
+    distribution <- "\\(Geom \\)"
+    arguments <- paste0("\\(p= \\)", p_dist, sep = " ")
+  }
+  
+  else if(distribution_choice %in% c("negative1", "negative2")){
+    distribution <- "\\(NG \\)"
+    arguments <- paste0("\\(r= \\)", n_dist, "\\(,p= \\)", p_dist, sep = " ")
+  }
+  
+  explanation <- paste0("\\(X \\sim \\)", distribution, "\\(( \\)", arguments, "\\()\\)", "\\(and\\)", sep = " ")
+  
+  if(tail_distribution == "under_x")
+    distrib <- paste0(explanation, "\\(P(X \\leq \\)", x_dist, "\\() \\)", "\\(= \\)", sep = " ")
+  else if(tail_distribution == "above_x")
+    distrib <- paste0(explanation, "\\(P(X > \\)", x_dist, "\\() \\)", "\\(= \\)", sep = " ")  
+  else if(tail_distribution == "interval")
+    distrib <- paste0(explanation, "\\(P(\\)", a_dist, "\\(\\leq X \\leq \\)", b_dist, "\\()= \\)",  sep = " ") 
+  
+  distrib %>% withMathJax() %>% return()
+  
+  
+}
 
 
 

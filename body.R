@@ -1,4 +1,6 @@
 body <- dashboardBody(
+
+  includeCSS("INFORMATION/STYLE.css"),
   
   withMathJax(),
   
@@ -114,7 +116,35 @@ body <- dashboardBody(
                                         DT::DTOutput("dt_Binomial")),
                                tabPanel(title = "Plot",
                                         plotly::plotlyOutput("plot_Binomial"))
-                             )),
+                             ),
+                             fluidRow(
+                               column(
+                                 width = 6,
+                                 offset = 3,
+                                 box(
+                                   title = "Distribution Information",
+                                   width = NULL,
+                                   accordion(
+                                     accordionItem(
+                                       id = 4,
+                                       title = "Distribution Function",
+                                       color = "danger",
+                                       collapsed = TRUE,
+                                       uiOutput("distribution_Binomial")),
+                                     accordionItem(
+                                       id = 5,
+                                       title = "Probability Funcion",
+                                       color = "warning",
+                                       collapsed = TRUE,
+                                       uiOutput("probability_Binomial")),
+                                     accordionItem(
+                                       id = 6,
+                                       title = "Summary",
+                                       color = "info",
+                                       collapsed = TRUE,
+                                       uiOutput("summary_Binomial"))
+                                   ))))
+                             ),
             #Geometric (I)
             conditionalPanel(condition = "input.discrete == 'Geometric' && input.geometric == 'geometric1'",
                              tabsetPanel(
