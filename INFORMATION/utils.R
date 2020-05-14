@@ -2,7 +2,6 @@
 #'@description Obtain a dataset of notifications for the header shiny
 #'@param path path of the json file
 #'@return Data.table obtained from a JSON file
-
 notifications_list <- function(path){
   
   json_file <- jsonlite::fromJSON(path)
@@ -25,12 +24,15 @@ notifications_list <- function(path){
 }
 
 
+####### Statistical Distributions ##########################
+
+### Discrete Distributions ##################
+
 #'@description Obtain a dataset of the distribution of a discrete Random Variable
-#'@param path argumnents of each quantile and probability function from a discrete random variable
+#'@param argumnents of each quantile and probability function from a discrete random variable
 #'@return Data.table with three columns, one, is the observations of the random variable, the next column 
 #'indicate if the values are under, upper given a number x or inside an interval [a,b], and the last column
 #'is the probability function this is the probability of each x
-
 discrete_distribution <- function(distribution_choice = c("binomial", "hypergeometric", "poisson", 
                                                           "geometric1", "geometric2", "negative1", 
                                                           "negative2"),
@@ -53,7 +55,7 @@ discrete_distribution <- function(distribution_choice = c("binomial", "hypergeom
   )
   
   quantile_values_list <- map(c(FALSE, TRUE), 
-                              function(under_x = c(TRUE, FALSE)){
+                              function(under_x){
                                 
                                 invoke_map(list(binomial = safely(qbinom), hypergeometric = safely(qhyper),  
                                                 poisson = safely(qpois), geometric = safely(qgeom), negative = safely(qnbinom)),
@@ -133,11 +135,39 @@ discrete_distribution <- function(distribution_choice = c("binomial", "hypergeom
   
 }
 
+
+#'@description Create a beautiful datatable from a discrete distribution
+#'@param discrete_reactive reactive discrete datasets
+#'@return beautiful DT with specific arguments 
+dataset_discrete_reactive <- function(discrete_reactive){
+  
+  df <- copy(discrete_reactive) %>% setnames(old = "RANDOM_VARIABLE", new = "RANDOM VARIABLE") %>% 
+    .[,PROBABILITY:=round(PROBABILITY, 5)]
+  
+  factors_vars <- c("RANDOM VARIABLE", "ID")
+  
+  df[,(factors_vars):=lapply(.SD, as.factor), .SDcols = factors_vars] %>% 
+    .[,PROBABILITY := scales::percent(x = PROBABILITY, accuracy = 0.00001)]
+  
+  DT::datatable(data = df, 
+                style = 'bootstrap', #theme of the datatable
+                
+                filter = list(position = 'top', clear = FALSE),
+                
+                options = list(
+                  
+                  autoWidth = TRUE,
+                  
+                  pageLength = df[,.N, by = "ID"] %>% 
+                    .[,.(mean(N, na.rm = TRUE))] %>% as.integer())
+  )  
+}
+
+
 #'@description Create a plot of the probability of each x of X (funcion de masa de probabilidad)
 #'to observe the behavior of the Distribution Function F(x)
 #'@param df_discrete
 #'@return plot of the discrete distribution
-
 discrete_plot <- function(df_discrete){
   
   plot <- df_discrete %>% ggplot(aes(x = as.factor(RANDOM_VARIABLE), y = PROBABILITY, fill = ID)) + 
@@ -165,18 +195,19 @@ discrete_plot <- function(df_discrete){
   
 }
 
-#'@description
-#'@param df_discrete
-#'@return 
 
-name <- function(distribution_choice = c("binomial", "hypergeometric", "poisson", 
-                                         "geometric1", "geometric2", "negative1", 
-                                         "negative2"), 
-                 tail_distribution = c("under_x", "above_x", "interval"), 
-                 n_dist = NULL, p_dist = NULL, 
-                 lambda_dist = NULL, M_dist = NULL,
-                 N_dist = NULL, x_dist = NULL, 
-                 a_dist = NULL, b_dist = NULL) {  
+#'@description Create latex formula adding the value of the distribution function for a value x, a or b of 
+#'the distribution
+#'@param argumnents of each distribution 
+#'@return a withMathJax formula latex of the information of each distribution
+distrib_representation <- function(distribution_choice = c("binomial", "hypergeometric", "poisson", 
+                                                           "geometric1", "geometric2", "negative1", 
+                                                           "negative2"), 
+                                   tail_distribution = c("under_x", "above_x", "interval"), 
+                                   n_dist = NULL, p_dist = NULL, 
+                                   lambda_dist = NULL, M_dist = NULL,
+                                   N_dist = NULL, x_dist = NULL, 
+                                   a_dist = NULL, b_dist = NULL) {  
   
   if(distribution_choice == "binomial"){
     distribution <- "\\(Bin \\)"
@@ -212,11 +243,133 @@ name <- function(distribution_choice = c("binomial", "hypergeometric", "poisson"
   else if(tail_distribution == "interval")
     distrib <- paste0(explanation, "\\(P(\\)", a_dist, "\\(\\leq X \\leq \\)", b_dist, "\\()= \\)",  sep = " ") 
   
-  distrib %>% withMathJax() %>% return()
+  distribution_args <- list(binomial_args = list(size = n_dist, prob = p_dist),
+                            hypergeometric_args = list(m = M_dist, n = N_dist, 
+                                                       k = n_dist),
+                            poisson_args = list(lambda = lambda_dist),
+                            geometric_args = list(prob = p_dist),
+                            negative_args = list(size = n_dist, prob = p_dist)
+  )
   
+  distribution_values_function <- function(quantile_value){
+    
+    map(c(FALSE, TRUE),
+        function(under_x){
+          
+          invoke_map(list(binomial = safely(pbinom), hypergeometric = safely(phyper),
+                          poisson = safely(ppois), geometric = safely(pgeom), negative = safely(pnbinom)),
+                     
+                     list(binomial_args = list(q = quantile_value, lower.tail = under_x) %>% 
+                            append(distribution_args$binomial_args),
+                          
+                          hypergeometric_args = list(q = quantile_value, lower.tail = under_x) %>% 
+                            append(distribution_args$hypergeometric_args),
+                          
+                          poisson_args = list(q = quantile_value, lower.tail = under_x) %>% 
+                            append(distribution_args$poisson_args),
+                          
+                          geometric_args = list(q = quantile_value, lower.tail = under_x) %>% 
+                            append(distribution_args$geometric_args),
+                          
+                          negative_args = list(q = quantile_value, lower.tail = under_x) %>% 
+                            append(distribution_args$negative_args)
+                          
+                     )
+          ) %>% map("result") %>% discard(~is.null(.x))
+        }
+        
+    ) %>% set_names(c("upper_tail", "under_tail")) %>% map(~.x[[str_extract(string = distribution_choice, pattern = "[^\\d]*")]])
+    
+  }
+  
+  interval_values <- function(b_a){
+    value <- map(b_a, distribution_values_function) %>% set_names(c("b", "a")) %>% 
+      map("under_tail") 
+    ifelse(a_dist <= b_dist, value$b-value$a, "a must be less than or equal to b") %>% return()
+  }
+  
+  if(distribution_choice %in% c("binomial", "hypergeometric", "poisson", "geometric1", "negative1")){
+    if(tail_distribution == "under_x") distribution_values <- distribution_values_function(x_dist)$under_tail
+    else if(tail_distribution == "above_x") distribution_values <- distribution_values_function(x_dist)$upper_tail
+    else if(tail_distribution == "interval")
+      distribution_values <- interval_values(b_a = list(b_dist, a_dist-1))
+  }
+  else if(distribution_choice == "geometric2"){
+    if(tail_distribution == "under_x") distribution_values <- distribution_values_function(x_dist-1)$under_tail
+    else if(tail_distribution == "above_x") distribution_values <- distribution_values_function(x_dist-1)$upper_tail
+    else if(tail_distribution == "interval")
+      distribution_values <- interval_values(b_a = list(b_dist-1, a_dist-2))
+  }
+  else if(distribution_choice == "negative2"){
+    if(tail_distribution == "under_x") distribution_values <- distribution_values_function(x_dist-n_dist)$under_tail
+    else if(tail_distribution == "above_x") distribution_values <- distribution_values_function(x_dist-n_dist)$upper_tail
+    else if(tail_distribution == "interval")
+      distribution_values <- interval_values(b_a = list(b_dist-n_dist, a_dist-n_dist-1))
+  }
+  
+  distribution_values <- ifelse(is.numeric(distribution_values), 
+                                distribution_values %>% round(5) %>% scales::percent(accuracy = 0.00001),
+                                distribution_values)
+  
+  paste0(distrib, distribution_values, sep = " ") %>% withMathJax() %>% return()
   
 }
 
+
+#'@description Write the respective probability function of each distribution
+#'@param distribution_choice 
+#'@return Latex of a formula
+prob_representation <- function(distribution_choice = c("binomial", "hypergeometric", "poisson", 
+                                                        "geometric1", "geometric2", "negative1", 
+                                                        "negative2")){
+  if(distribution_choice == "binomial")
+    withMathJax(
+      helpText("Probability mass function: $$ f(x) = P(X = x) = \\binom{n}{x}p^x(1-p)^{n-x}$$"),
+      br(),
+      helpText("where \\( x = 0, 1, \\dots, n\\) and \\( 0 \\leq p \\leq 1 \\)")
+    )
+  else if(distribution_choice == "hypergeometric") 
+    withMathJax(
+      helpText("Probability mass function: $$ f(x) = P(X = x) = \\dfrac{\\binom{M}{x} \\binom{N-M}{n-x}}{\\binom{N}{n}}  $$"),
+      br(),
+      helpText("for \\( x = 0, 1, \\dots , n\\)"),
+      br(),
+      helpText("where \\( x \\leq M \\) and \\( n - x \\leq N - M \\)")
+    )
+  else if(distribution_choice == "poisson") 
+    withMathJax(
+      helpText("Probability mass function: $$ f(x) = P(X = x) = \\dfrac{e^{-\\lambda}\\lambda^x}{x!} $$"),
+      br(),
+      helpText("for \\( x = 0, 1, 2, \\dots\\)"),
+      br(),
+      helpText("where \\( \\lambda > 0 \\)")
+    )
+  else if(distribution_choice == "geometric1") 
+    withMathJax(
+      helpText("Probability mass function: $$ f(x) = P(X=x) = (1-p)^x p $$"),
+      br(),
+      helpText("where \\( x = 0, 1, 2, \\dots \\) and \\( 0 < p \\leq 1 \\)")
+    )
+  else if(distribution_choice == "geometric2") 
+    withMathJax(
+      helpText("Probability mass function: $$ f(x) = P(X=x) = (1-p)^{x-1} p $$"),
+      br(),
+      helpText("where \\( x = 1, 2, \\dots \\) and \\( 0 < p \\leq 1 \\)")
+    )
+  
+  else if(distribution_choice == "negative1") 
+    withMathJax(
+      helpText("Probability mass function: $$ f(x) = P(X = x) = \\binom{x+r-1}{r-1} (1-p)^x p^r $$"),
+      br(),
+      helpText("where \\( x = 0, 1, 2, \\dots, r = 1, 2, \\dots \\) and \\( 0 < p \\leq 1 \\)")
+    )
+  else if(distribution_choice == "negative2") 
+    withMathJax(
+      helpText("Probability mass function: $$ f(x) = P(X = x) = \\binom{x-1}{r-1}p^r (1-p)^{x-r} $$"),
+      br(),
+      helpText("where \\( x = r, r+1, \\dots \\) and \\( 0 < p \\leq 1 \\)")
+    )
+}
 
 
 

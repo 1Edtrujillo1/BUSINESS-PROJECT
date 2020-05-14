@@ -1,5 +1,5 @@
 body <- dashboardBody(
-
+  
   includeCSS("INFORMATION/STYLE.css"),
   
   withMathJax(),
@@ -133,7 +133,7 @@ body <- dashboardBody(
                                        uiOutput("distribution_Binomial")),
                                      accordionItem(
                                        id = 5,
-                                       title = "Probability Funcion",
+                                       title = "Probability Function",
                                        color = "warning",
                                        collapsed = TRUE,
                                        uiOutput("probability_Binomial")),
@@ -144,7 +144,7 @@ body <- dashboardBody(
                                        collapsed = TRUE,
                                        uiOutput("summary_Binomial"))
                                    ))))
-                             ),
+            ),
             #Geometric (I)
             conditionalPanel(condition = "input.discrete == 'Geometric' && input.geometric == 'geometric1'",
                              tabsetPanel(
@@ -152,7 +152,35 @@ body <- dashboardBody(
                                         DT::DTOutput("dt_geometric1")),
                                tabPanel(title = "Plot",
                                         plotly::plotlyOutput("plot_geometric1"))
-                             )),
+                             ),
+                             fluidRow(
+                               column(
+                                 width = 6,
+                                 offset = 3,
+                                 box(
+                                   title = "Distribution Information",
+                                   width = NULL,
+                                   accordion(
+                                     accordionItem(
+                                       id = 7,
+                                       title = "Distribution Function",
+                                       color = "danger",
+                                       collapsed = TRUE,
+                                       uiOutput("distribution_geometric1")),
+                                     accordionItem(
+                                       id = 8,
+                                       title = "Probability Function",
+                                       color = "warning",
+                                       collapsed = TRUE,
+                                       uiOutput("probability_geometric1")),
+                                     accordionItem(
+                                       id = 9,
+                                       title = "Summary",
+                                       color = "info",
+                                       collapsed = TRUE,
+                                       uiOutput("summary_geometric1"))
+                                   ))))
+            ),
             #Geometric (II)
             conditionalPanel(condition = "input.discrete == 'Geometric' && input.geometric == 'geometric2'",
                              tabsetPanel(
@@ -160,7 +188,35 @@ body <- dashboardBody(
                                         DT::DTOutput("dt_geometric2")),
                                tabPanel(title = "Plot",
                                         plotly::plotlyOutput("plot_geometric2"))
-                             )),
+                             ),
+                             fluidRow(
+                               column(
+                                 width = 6,
+                                 offset = 3,
+                                 box(
+                                   title = "Distribution Information",
+                                   width = NULL,
+                                   accordion(
+                                     accordionItem(
+                                       id = 10,
+                                       title = "Distribution Function",
+                                       color = "danger",
+                                       collapsed = TRUE,
+                                       uiOutput("distribution_geometric2")),
+                                     accordionItem(
+                                       id = 11,
+                                       title = "Probability Function",
+                                       color = "warning",
+                                       collapsed = TRUE,
+                                       uiOutput("probability_geometric2")),
+                                     accordionItem(
+                                       id = 12,
+                                       title = "Summary",
+                                       color = "info",
+                                       collapsed = TRUE,
+                                       uiOutput("summary_geometric2"))
+                                   ))))
+            ),
             #Negative Binomial (I)
             conditionalPanel(condition = "input.discrete == 'Negative Binomial' && input.negativebinomial == 'negativebinomial1'",
                              tabsetPanel(
@@ -168,7 +224,35 @@ body <- dashboardBody(
                                         DT::DTOutput("dt_negativebinomial1")),
                                tabPanel(title = "Plot",
                                         plotly::plotlyOutput("plot_negativebinomial1"))
-                             )),
+                             ),
+                             fluidRow(
+                               column(
+                                 width = 6,
+                                 offset = 3,
+                                 box(
+                                   title = "Distribution Information",
+                                   width = NULL,
+                                   accordion(
+                                     accordionItem(
+                                       id = 13,
+                                       title = "Distribution Function",
+                                       color = "danger",
+                                       collapsed = TRUE,
+                                       uiOutput("distribution_negativebinomial1")),
+                                     accordionItem(
+                                       id = 14,
+                                       title = "Probability Function",
+                                       color = "warning",
+                                       collapsed = TRUE,
+                                       uiOutput("probability_negativebinomial1")),
+                                     accordionItem(
+                                       id = 15,
+                                       title = "Summary",
+                                       color = "info",
+                                       collapsed = TRUE,
+                                       uiOutput("summary_negativebinomial1"))
+                                   ))))
+            ),
             #Negative Binomial (II)
             conditionalPanel(condition = "input.discrete == 'Negative Binomial' && input.negativebinomial == 'negativebinomial2'",
                              tabsetPanel(
@@ -176,7 +260,34 @@ body <- dashboardBody(
                                         DT::DTOutput("dt_negativebinomial2")),
                                tabPanel(title = "Plot",
                                         plotly::plotlyOutput("plot_negativebinomial2"))
-                             )),
+                             ),
+                             fluidRow(
+                               column(
+                                 width = 6,
+                                 offset = 3,
+                                 box(
+                                   title = "Distribution Information",
+                                   width = NULL,
+                                   accordion(
+                                     accordionItem(
+                                       id = 16,
+                                       title = "Distribution Function",
+                                       color = "danger",
+                                       collapsed = TRUE,
+                                       uiOutput("distribution_negativebinomial2")),
+                                     accordionItem(
+                                       id = 17,
+                                       title = "Probability Function",
+                                       color = "warning",
+                                       collapsed = TRUE,
+                                       uiOutput("probability_negativebinomial2")),
+                                     accordionItem(
+                                       id = 18,
+                                       title = "Summary",
+                                       color = "info",
+                                       uiOutput("summary_negativebinomial2"))
+                                   ))))
+            ),
             #Hyper-Geometric
             conditionalPanel(condition = "input.discrete == 'Hyper-Geometric'",
                              tabsetPanel(
@@ -184,7 +295,34 @@ body <- dashboardBody(
                                         DT::DTOutput("dt_HyperGeometric")),
                                tabPanel(title = "Plot",
                                         plotly::plotlyOutput("plot_HyperGeometric"))
-                             )),
+                             ),
+                             fluidRow(
+                               column(
+                                 width = 6,
+                                 offset = 3,
+                                 box(
+                                   title = "Distribution Information",
+                                   width = NULL,
+                                   accordion(
+                                     accordionItem(
+                                       id = 19,
+                                       title = "Distribution Function",
+                                       color = "danger",
+                                       collapsed = TRUE,
+                                       uiOutput("distribution_HyperGeometric")),
+                                     accordionItem(
+                                       id = 20,
+                                       title = "Probability Function",
+                                       color = "warning",
+                                       collapsed = TRUE,
+                                       uiOutput("probability_HyperGeometric")),
+                                     accordionItem(
+                                       id = 21,
+                                       title = "Summary",
+                                       color = "info",
+                                       uiOutput("summary_HyperGeometric"))
+                                   ))))
+            ),
             #Poisson
             conditionalPanel(condition = "input.discrete == 'Poisson'",
                              tabsetPanel(
@@ -192,7 +330,35 @@ body <- dashboardBody(
                                         DT::DTOutput("dt_Poisson")),
                                tabPanel(title = "Plot",
                                         plotly::plotlyOutput("plot_Poisson"))
-                             ))
+                             ),
+                             fluidRow(
+                               column(
+                                 width = 6,
+                                 offset = 3,
+                                 box(
+                                   title = "Distribution Information",
+                                   width = NULL,
+                                   accordion(
+                                     accordionItem(
+                                       id = 22,
+                                       title = "Distribution Function",
+                                       color = "danger",
+                                       collapsed = TRUE,
+                                       uiOutput("distribution_Poisson")),
+                                     accordionItem(
+                                       id = 23,
+                                       title = "Probability Function",
+                                       color = "warning",
+                                       collapsed = TRUE,
+                                       uiOutput("probability_Poisson")),
+                                     accordionItem(
+                                       id = 24,
+                                       title = "Summary",
+                                       color = "info",
+                                       collapsed = TRUE,
+                                       uiOutput("summary_Poisson"))
+                                   ))))
+            )
             
     ),
     
