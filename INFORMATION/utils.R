@@ -372,6 +372,84 @@ prob_representation <- function(distribution_choice = c("binomial", "hypergeomet
 }
 
 
+#'@description  Create latex formula adding the calculation of the mean, variance, sd for each distribution
+#'@param distribution_choice and arguments of each distribution
+#'@return a WithMathJax formula latex join with a calculated value (mean, variance, sd)
+summary_representation <- function(distribution_choice = c("binomial", "hypergeometric", "poisson", 
+                                                           "geometric1", "geometric2", "negative1", 
+                                                           "negative2"),
+                                   n_dist = NULL, p_dist = NULL, 
+                                   lambda_dist = NULL, M_dist = NULL, N_dist = NULL){
+  if(distribution_choice == "binomial"){
+    mean <- "\\(np = \\)"
+    value_mean <- n_dist*p_dist
+    variance <- "\\(np(1-p) = \\)"
+    value_variance <- n_dist*p_dist*(1-p_dist)
+    standardesv <- "\\(\\sqrt{np(1-p)} = \\)"
+  }
+  else if(distribution_choice == "hypergeometric"){
+    mean <- "\\(n\\dfrac{M}{N} = \\)"
+    value_mean <- n_dist*(M_dist/N_dist)
+    variance <- "\\(n\\dfrac{M}{N}\\Big(1 - \\dfrac{M}{N}\\Big)\\Big(\\dfrac{N-n}{N-1}\\Big) =  \\)"
+    value_variance <- n_dist*(M_dist/N_dist)*(1-(M_dist/N_dist))*((N_dist-n_dist)/(N_dist-1))
+    standardesv <- "\\(\\sqrt{n\\dfrac{M}{N}\\Big(1 - \\dfrac{M}{N}\\Big)\\Big(\\dfrac{N-n}{N-1}\\Big)} = \\)"
+  }
+  else if(distribution_choice == "poisson"){
+    mean <- "\\(\\lambda = \\)"
+    value_mean <- lambda_dist
+    variance <- "\\(\\lambda = \\)"
+    value_variance <- lambda_dist
+    standardesv <- "\\(\\sqrt{\\lambda} = \\)"
+  }
+  else if(distribution_choice == "geometric1"){
+    mean <- "\\(\\dfrac{1-p}{p} = \\)"
+    value_mean <- (1-p_dist)/p_dist
+    variance <- "\\(\\dfrac{1-p}{p^2} = \\)"
+    value_variance <- (1-p_dist)/(p_dist^2)
+    standardesv <- "\\(\\sqrt{\\dfrac{1-p}{p^2}} = \\)"
+  }
+  else if(distribution_choice == "geometric2"){
+    mean <- "\\(\\dfrac{1}{p} = \\)"
+    value_mean <- 1/p_dist
+    variance <- "\\(\\dfrac{1-p}{p^2} = \\)"
+    value_variance <- (1-p_dist)/(p_dist^2)
+    standardesv <- "\\(\\sqrt{\\dfrac{1-p}{p^2}} = \\)"
+  }
+  else if(distribution_choice == "negative1"){
+    mean <- "\\(\\dfrac{r(1-p)}{p} = \\)"
+    value_mean <- (n_dist*(1-p_dist))/p_dist
+    variance <- "\\(\\dfrac{r(1-p)}{p^2} = \\)"
+    value_variance <- (n_dist*(1-p_dist))/(p_dist^2)
+    standardesv <- "\\(\\sqrt{\\dfrac{r(1-p)}{p^2}} = \\)"
+  }
+  else if(distribution_choice == "negative2"){
+    mean <- "\\(\\dfrac{r}{p} = \\)"
+    value_mean <- n_dist/p_dist
+    variance <- "\\(\\dfrac{r(1-p)}{p^2} = \\)"
+    value_variance <- (n_dist*(1-p_dist))/(p_dist^2)
+    standardesv <- "\\(\\sqrt{\\dfrac{r(1-p)}{p^2}} = \\)"
+  }
+  
+  values_summary <- map(list(value_mean = value_mean, value_variance = value_variance, 
+                             value_standardesv = sqrt(value_variance)), round, 3) 
+  
+  summary <- map2(
+    list(mean, variance, standardesv),
+    values_summary,
+    ~paste0(.x, .y, sep = " ")
+  ) %>% 
+    set_names(c("mean", "variance", "standardesv"))
+  
+  withMathJax(
+    helpText(paste0("\\(\\mu = E(X) = \\)", summary$mean, sep = " ")),
+    br(),
+    helpText(paste0("\\(\\sigma = SD(X) = \\)", summary$standardesv, sep = " ")),
+    br(),
+    helpText(paste0("\\(\\sigma^2 = Var(X) = \\)", summary$variance, sep = " "))
+  )
+  
+}
+
 
 
 

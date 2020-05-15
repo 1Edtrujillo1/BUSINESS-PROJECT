@@ -49,20 +49,9 @@ server <- function(input, output) {
   
   output$dt_Binomial <- DT::renderDT({dataset_discrete_reactive(discrete_reactive = my_binomial_reactive())})
   output$plot_Binomial <- plotly::renderPlotly({discrete_plot(df_discrete = my_binomial_reactive())})
-  
   output$distribution_Binomial <- renderUI({my_binomial_information_reactive()})
-  
   output$probability_Binomial <- renderUI({prob_representation (distribution_choice = "binomial")})
-  
-  output$summary_Binomial <- renderUI({
-    withMathJax(
-      helpText("\\(\\mu = E(X) = np = \\)", round(input$n_binomial * input$p_binomial, 3)),
-      br(),
-      helpText("\\(\\sigma = SD(X) = \\sqrt{np(1-p)} = \\)", round(sqrt(input$n_binomial * input$p_binomial * (1 - input$p_binomial)), 3)),
-      br(),
-      helpText("\\(\\sigma^2 = Var(X) = np(1-p) = \\)", round(input$n_binomial * input$p_binomial * (1 - input$p_binomial), 3))
-    )
-  })
+  output$summary_Binomial <- renderUI({summary_representation(distribution_choice = "binomial", n_dist = input$n_binomial, p_dist = input$p_binomial)})
   
   #Geometric (I)
   my_geometric1_reactive <- callModule(module = geometric1_reactive, id = "geo1_react", tails = reactive(input$tails_geometric1),
@@ -75,10 +64,9 @@ server <- function(input, output) {
   
   output$dt_geometric1 <- DT::renderDT({dataset_discrete_reactive(discrete_reactive = my_geometric1_reactive())})
   output$plot_geometric1 <- plotly::renderPlotly({discrete_plot(df_discrete = my_geometric1_reactive())})
-  
   output$distribution_geometric1 <- renderUI({my_geometric1_information_reactive()})
-  
   output$probability_geometric1 <- renderUI({prob_representation (distribution_choice = "geometric1")})
+  output$summary_geometric1 <- renderUI({summary_representation(distribution_choice = "geometric1", p_dist = input$p_geometric1)})
   
   #Geometric (II)
   my_geometric2_reactive <- callModule(module = geometric2_reactive, id = "geo2_react", tails = reactive(input$tails_geometric2),
@@ -91,10 +79,10 @@ server <- function(input, output) {
   
   output$dt_geometric2 <- DT::renderDT({dataset_discrete_reactive(discrete_reactive = my_geometric2_reactive())})
   output$plot_geometric2 <- plotly::renderPlotly({discrete_plot(df_discrete = my_geometric2_reactive())})
-  
   output$distribution_geometric2 <- renderUI({my_geometric2_information_reactive()})
-  
   output$probability_geometric2 <- renderUI({prob_representation (distribution_choice = "geometric2")})
+  output$summary_geometric2 <- renderUI({summary_representation(distribution_choice = "geometric2", p_dist = input$p_geometic2)})
+  
   
   #Negative Binomial (I)
   my_negativebinomial1_reactive <- callModule(module = negativebinomial1_reactive, id = "neg1_react", 
@@ -109,10 +97,10 @@ server <- function(input, output) {
   
   output$dt_negativebinomial1 <- DT::renderDT({dataset_discrete_reactive(discrete_reactive = my_negativebinomial1_reactive())})
   output$plot_negativebinomial1 <- plotly::renderPlotly({discrete_plot(df_discrete = my_negativebinomial1_reactive())}) 
-  
   output$distribution_negativebinomial1 <- renderUI({my_negativebinomial1_information_reactive()})
-  
   output$probability_negativebinomial1 <- renderUI({prob_representation (distribution_choice = "negative1")})
+  output$summary_negativebinomial1 <- renderUI({summary_representation(distribution_choice = "negative1",
+                                                                       n_dist = input$r_negativebinomial1, p_dist = input$p_negativebinomial1)})
   
   #Negative Binomial (II)
   my_negativebinomial2_reactive <- callModule(module = negativebinomial2_reactive, id = "neg2_react",
@@ -127,10 +115,10 @@ server <- function(input, output) {
   
   output$dt_negativebinomial2 <- DT::renderDT({dataset_discrete_reactive(discrete_reactive = my_negativebinomial2_reactive())})
   output$plot_negativebinomial2 <- plotly::renderPlotly({discrete_plot(df_discrete = my_negativebinomial2_reactive())})
-  
   output$distribution_negativebinomial2 <- renderUI({my_negativebinomial2_information_reactive()})
-  
   output$probability_negativebinomial2 <- renderUI({prob_representation (distribution_choice = "negative2")})
+  output$summary_negativebinomial2 <- renderUI({summary_representation(distribution_choice ="negative2", 
+                                                                       n_dist = input$r_negativebinomial2, p_dist = input$p_negativebinomial2)})
   
   #Hyper-Geometric
   my_hypergeometric_reactive <- callModule(module = hypergeometric_reactive, id = "hyper_react", tails = reactive(input$tails_hypergeometric), 
@@ -145,10 +133,10 @@ server <- function(input, output) {
   
   output$dt_HyperGeometric <- DT::renderDT({dataset_discrete_reactive(discrete_reactive = my_hypergeometric_reactive())})
   output$plot_HyperGeometric <- plotly::renderPlotly({discrete_plot(df_discrete = my_hypergeometric_reactive())})
-  
   output$distribution_HyperGeometric <- renderUI({my_hypergeometric_information_reactive()})
-  
   output$probability_HyperGeometric <- renderUI({prob_representation (distribution_choice = "hypergeometric")})
+  output$summary_HyperGeometric <- renderUI({summary_representation(distribution_choice = "hypergeometric", n_dist = input$n_hypergeometric,
+                                                                    M_dist = input$M_hypergeometric, N_dist = input$N_hypergeometric)})
   
   #Poisson
   my_poisson_reactive <- callModule(module = poisson_reactive, id = "poi_react", tails = reactive(input$tails_poisson), 
@@ -162,10 +150,9 @@ server <- function(input, output) {
   
   output$dt_Poisson <- DT::renderDT({dataset_discrete_reactive(discrete_reactive = my_poisson_reactive())})
   output$plot_Poisson <- plotly::renderPlotly({discrete_plot(df_discrete = my_poisson_reactive())})
-  
   output$distribution_Poisson <- renderUI({my_poisson_information_reactive()})
-  
   output$probability_Poisson <- renderUI({prob_representation (distribution_choice = "poisson")})
+  output$summary_Poisson <- renderUI({summary_representation(distribution_choice = "poisson", lambda_dist = input$lambda_poisson)})
   
   
   
