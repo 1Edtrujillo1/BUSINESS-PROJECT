@@ -2,7 +2,6 @@ sidebar <- dashboardSidebar(
   
   
   # Add a search option -----------------------------------------------------
-  
   sidebarSearchForm(
     textId = "searchtext",
     buttonId = "searchbutton",
@@ -12,31 +11,32 @@ sidebar <- dashboardSidebar(
   
   
   # Add the labels of the sidebar -------------------------------------------
-  
   sidebarMenu(
-    
     id = "leftbar",
     
     
     # Presentation ------------------------------------------------------------
-    
     menuItem(
       text = "Presentation",
       tabName = "presentation",
       icon = icon(name = "vector-square")
     ),
     
-    
-    # Descriptive Statistics options
-    
+    # Raw Data ----------------------------------------------------------------
+    menuItem(
+      text = "Raw Data",
+      tabName = "rawdata",
+      icon = icon(name = "table")
+    ),
+
+    # Descriptive Statistics options ------------------------------------------
     menuItem(
       text = "Descriptive Statistics",
       tabName = "DS",
       icon = icon(name = "calculator", class = "fas fa-calculator", lib = "font-awesome")
     ),
     
-    # Statistical Distributions options
-    
+    # Statistical Distributions options ---------------------------------------
     menuItem(
       text = "Statistical Distributions",
       icon = icon(name = "chart-bar", class = "fas fa-chart-bar", lib = "font-awesome"),
@@ -50,8 +50,7 @@ sidebar <- dashboardSidebar(
         icon = icon("angle-right"))
     ),
     
-    # Unsupervised learning options
-    
+    # Unsupervised learning options -------------------------------------------
     menuItem(
       text = "Unsupervised Learning",
       icon = icon("brain"),
@@ -65,8 +64,7 @@ sidebar <- dashboardSidebar(
         icon = icon("angle-right"))
     ),
     
-    # Supervised learning options
-    
+    # Supervised learning options ---------------------------------------------
     menuItem(
       text = "Supervised Learning",
       icon = icon("code-branch"),
@@ -88,8 +86,7 @@ sidebar <- dashboardSidebar(
         icon = icon("angle-right"))
     ),
     
-    # Forcast options
-    
+    # Forcast options ---------------------------------------------------------
     menuItem(
       text = "Forcast",
       tabName = "forcast",

@@ -1,25 +1,22 @@
 
 rightsidebar <- rightSidebar(
-  
-  
+
   # Add the background of the right bar -------------------------------------
-  
   background = "light",
   
   # Add the labels of the right bar -------------------------------------------
   
   ######################## Database Options ################################  
-  
   rightSidebarTabContent(
     id = 1,
     title = "DataBases",
     icon = "database",
     active = FALSE, #Se pueda mover entre los temas
-    sliderInput(
-      "obs",
-      "Number of observations:",
-      min = 0, max = 1000, value = 500
-    )
+    
+    ####### Raw Data ##########################
+    conditionalPanel(condition = "input.leftbar == 'rawdata'",
+                     raw_dataInput_rightsidebar("raw_data")
+                     )
   ),
   
   ######################## Filters Options ################################

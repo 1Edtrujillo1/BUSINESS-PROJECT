@@ -2,8 +2,13 @@
 library(purrr)
 
 map(c("shiny", "shinydashboard", "dashboardthemes", "shinydashboardPlus", "shinyWidgets", "mixdist","DT",
-      "jsonlite", "data.table", "dplyr", "bit64", "stringr", "scales", "ggplot2", "plotly"), 
+      "jsonlite", "data.table", "dplyr", "bit64", "stringr", "scales", "ggplot2", "plotly",
+      "haven", "readxl", "lubridate"), 
     require, character.only = TRUE)
+
+map(c("INFORMATION/RAW_DATA/raw_data.R", "INFORMATION/RAW_DATA/reactive_raw_data.R", 
+      "INFORMATION/RAW_DATA/additional_raw_data.R"),
+    source)
 
 map(c("header.R", "sidebar.R", "body.R", "rightsidebar.R",
       "INFORMATION/utils.R", "INFORMATION/reactive_expressions.R"), 
@@ -17,6 +22,8 @@ ui <- dashboardPagePlus(header = header,  sidebar = sidebar,
 # Define server -----------------------------------------------------------
 
 server <- function(input, output) {
+  
+  options(shiny.maxRequestSize=100*1024^2) #accept files of MB bigger
   
   # Create a Dynamic notifications for the header
   
@@ -32,6 +39,10 @@ server <- function(input, output) {
     dropdownMenu(type = "notifications", .list = ntfcation)
     
   })
+  
+  ####### Raw Data ##########################
+  
+  raw_data <- callModule(module = raw_dataOutput, id = "raw_data")
   
   ####### Statistical Distributions ##########################
   

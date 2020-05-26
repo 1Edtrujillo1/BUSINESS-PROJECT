@@ -2,17 +2,14 @@ body <- dashboardBody(
   
   includeCSS("INFORMATION/STYLE.css"),
   
-  withMathJax(),
+  withMathJax(), #Allow math latex formulas in the body
   
   # Add the theme to the paper ----------------------------------------------
-  
   dashboardthemes:: shinyDashboardThemes(
     theme = "grey_dark"
   ),
   
-  
   # Add boxes for the home header options -----------------------------------
-  
   conditionalPanel(
     condition = "input.basemenu == 'Home' && input.leftbar == 'presentation'",
     fluidRow(
@@ -92,14 +89,18 @@ body <- dashboardBody(
   tabItems(
     
     # Presentation Page
-    
     tabItem(
       tabName = "presentation",
       "Presentation of the Page"
     ),
     
-    # Descriptive Statistics
+    # Raw Data
+    tabItem(
+      tabName = "rawdata",
+      raw_dataInput_body("raw_data")
+    ),
     
+    # Descriptive Statistics
     tabItem(tabName = "DS",
             "Modify1"
     ),
@@ -107,7 +108,6 @@ body <- dashboardBody(
     ####### Statistical Distributions ##########################
     
     ### Discrete Distributions ##################
-    
     tabItem(tabName = "SDiscrete",
             #Binomial
             conditionalPanel(condition = "input.discrete == 'Binomial'",
@@ -363,13 +363,11 @@ body <- dashboardBody(
     ),
     
     ### Continous Distributions ##################
-    
     tabItem(tabName = "SDcontinous",
             "Modify2.1"
     ),
     
     # Unsupervised Learning
-    
     tabItem(tabName = "ULclustering",
             "Modify3"
     ),
@@ -378,7 +376,6 @@ body <- dashboardBody(
     ),
     
     # Supervised Learning
-    
     tabItem(tabName = "SLregression",
             "Modify4"
     ),
@@ -394,7 +391,6 @@ body <- dashboardBody(
     ),
     
     # Forcast
-    
     tabItem(tabName = "forcast",
             "Modify5"
     )
