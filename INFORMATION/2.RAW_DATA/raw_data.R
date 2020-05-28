@@ -10,22 +10,19 @@ special_chrs = c('Š'='S', 'š'='s', 'Ž'='Z', 'ž'='z', 'À'='A', 'Á'='A', 'Â
                  'ö'='o', 'ø'='o', 'ù'='u', 'ú'='u', 'û'='u', 'ý'='y', 'ý'='y',
                  'þ'='b', 'ÿ'='y', 'ã'='a')
 
-#FINAL DATASET
-#1.IMPORTAR-
-#2.ELIMINAR CARACTERES ESPECIALES-
-#3.VARIABLES EN MAYUSCULAS-
-#4.OBSERVACIONES EN MAYUSCULAS-
-#5.DATA TYPE (FACTOR, CHARACTER, NUMERIC, INTEGER)-
-#6. key (date - factor) - 
-#7.NUMERIC AND INTEGER -> NA TO Z-SCORE +-3-
-#8. NA, "", NULL
-#' @description 
-#' @param path 
-#' @return
+#' @description: 
+#' @1.Import a dataset of any type of termination (.sas, .rds, .txt, .csv, .xls, .xlsx)
+#' @2.Add the parameter col_select, to select variables that we want from the dataset
+#' @3.Delete special characters
+#' @4.Toupper Variables 
+#' @5.Toupper observations
+#' @6.Assign the correct data type to each variable
+#' @7.Change "" strings
+#' @param path and arguments of importing
+#' @return a clean dataset
 read_data <- function(path, encoding = 'UTF-8', sheet = 1, col_select = NULL, ...){
   
-  
-  options(encoding = encoding, warn = -1) #hide warnings
+  options(encoding = encoding, warn = -1) #warn = -1 hide warnings
   
   if(str_detect(string = path, pattern = ".sas7bdat$"))
     df <- haven::read_sas(data_file = path, encoding = encoding, ...)
@@ -38,6 +35,10 @@ read_data <- function(path, encoding = 'UTF-8', sheet = 1, col_select = NULL, ..
   else if(str_detect(string = path, pattern = "\\.xls$|\\.xlsx$"))
     df <- readxl::read_excel(path = path, sheet = sheet, col_names = TRUE, na = "", ...)
   else NULL
+  
+  if(!is.null(col_select)){
+    df <- df[,(unique(col_select)), with = FALSE]
+  }
   
   df <- df %>% as.data.table() %>% 
     .[,(unique(names(df))), with = FALSE]
@@ -54,19 +55,16 @@ read_data <- function(path, encoding = 'UTF-8', sheet = 1, col_select = NULL, ..
     .[,(character_variables):=map(.SD, str_trim), .SDcols = character_variables] %>% 
     .[,lapply(.SD, assign_data_type), .SDcols = names(df)]
   
-  if(!is.null(col_select)){
-    df <- df[,(unique(col_select)), with = FALSE]
-  }
-  
   return(df)
   
 }
 #a <- "C:/Users/actje/Dropbox/PROGRAM_FILES/1. PROJECT/STATISTICS/INFORMATION/FILES/my_data.csv"
 #df <- read_data(path = a)
 
-#' @description 
+#' @description this function assign the correct datatype of a variable, and is 
+#' useful when we want to assign the correct datatype to each variable of a dataset 
 #' @param variable
-#' @return
+#' @return correct data type of a variable
 assign_data_type <- function(variable){
   
   values_type <- map(variable,function(variable){
@@ -92,16 +90,16 @@ assign_data_type <- function(variable){
   
   variable
 }
-
 # for(i in 1:length(df)){
 #   print(paste0(class(assign_data_type(df[[i]])), names(df)[[i]], sep = "," ))
 # }
 #assign_data_type(df$SPECIES) %>% class()
 
-#' @description 
+#' @description this function brings all the variables of a dataset that are in 
+#' a certain data type
 #' @param data_type 
 #' @param df
-#' @return
+#' @return vector of strings of variables that are in a certain data type
 classes_vector <- function(data_type, df){
   
   list_types <- map(names(df), ~df[,class(get(.x))]) %>% 
@@ -112,13 +110,13 @@ classes_vector <- function(data_type, df){
     names() %>% return()
   
 }
-
 #classes_vector(data_type = "numeric", df = df)
 
-#' @description 
+#' @description this function create a key of secuence´s days based on a level of a dataset, 
+#' and to be a unique key we paste each date with the name of the level 
 #' @param df 
 #' @param level=factor_variable
-#' @return
+#' @return key for a dataset
 key_creation <- function(df, level){
   df[,DATE:= sort((today()+ 1:.N * days(-1))), 
      by = level] %>% 
@@ -128,10 +126,14 @@ key_creation <- function(df, level){
 }
 #A <- key_creation(df = copy(df), level = "SPECIES")
 
-#' @description 
+#' @description this function first calculate the z-score of each variable(numeric or integer) grouped by 
+#' a level of a dataset and assign it as a new variable (for each calculated), after that for each new calculated 
+#' variable that has a z-score +-3 then the observation of the original variable is going to be a NA (to not 
+#' affect the distribution of the variable) and finally delete the calculated variables, to only have the original
+#' variables without the outliers
 #' @param df 
 #' @param level=factor_variable
-#' @return
+#' @return original dataset without the outliers of each variable
 delete_outliers <- function(df, level){
   
   choose_level <- str_subset(string = classes_vector(data_type = "factor", df = df),
@@ -155,7 +157,7 @@ delete_outliers <- function(df, level){
   for(i in 1:length(variable)){
     numb_sd_var <- numb_sd[i] 
     var <- variable[i]
-    df2[,(var):=ifelse(get(numb_sd_var) > -3 & get(numb_sd_var) < 3, get(var), NA), by = choose_level]
+    df2[,(var):=ifelse(get(numb_sd_var) > -3 & get(numb_sd_var) < 3, get(var), NA), by = choose_level] #in this interval the observatioon is not an outlier 
   }
   
   df2[,(numb_sd):=NULL] %>% 

@@ -1,6 +1,13 @@
 ####### Statistical Distributions ##########################
 
 ### Discrete Distributions ##################
+
+#' @description create reactive expressions representing the dataset and 
+#' the functions for the boxes in inputs body 
+#' @param inputs in module form
+#' @return reactive expressions in module format
+
+### Discrete Distributions ##################
 #Binomial
 binomial_reactive <- function(input, output, session, tails, n, p, x, a, b){
   reactive({

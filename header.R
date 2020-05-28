@@ -5,9 +5,11 @@ header <- dashboardHeaderPlus(
   
   # Add a Dynamic Notifications ---------------------------------------------
   NotificationmenuInput_header("notifications"),
+  
   # Enable the right bar with an icon ---------------------------------------
   enable_rightsidebar = TRUE,
   rightSidebarIcon = "align-justify",
+  
   # Add the home menu in the HomemenuInput_body function of the reac --------
   left_menu = tagList(
     dropdownBlock(

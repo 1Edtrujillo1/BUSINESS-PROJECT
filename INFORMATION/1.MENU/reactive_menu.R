@@ -1,7 +1,7 @@
 # NOTIFICATIONS -----------------------------------------------------------
-#'@description Obtain a dataset of notifications for the header shiny
-#'@param path path of the json file
-#'@return Data.table obtained from a JSON file
+#' @description Obtain a dataset of notifications for the header shiny
+#' @param path path of the json file
+#' @return Data.table obtained from a JSON file
 notifications_list <- function(path){
   
   json_file <- jsonlite::fromJSON(path)
@@ -23,17 +23,17 @@ notifications_list <- function(path){
   
 }
 
-#'@description 
-#'@param path 
-#'@return 
+#' @description This input represent notifications in the header
+#' @param id to connect each inputs and the output in the same session 
+#' @return input for notification in the header
 NotificationmenuInput_header <- function(id){
   ns = NS(id)
   dropdownMenuOutput(outputId = ns("notificationMenu"))
 }
 
-#'@description 
-#'@param path 
-#'@return 
+#' @description Create an interactive notification ouput
+#' @param parameters of a shiny module 
+#' @return notifications output
 NotificationmenuOutput <- function(input, output, session){
   ns <- session$ns
   output$notificationMenu <- renderMenu({
@@ -50,9 +50,9 @@ NotificationmenuOutput <- function(input, output, session){
 }
 
 # MENU --------------------------------------------------------------------
-#'@description 
-#'@param path 
-#'@return 
+#' @description Create different kind of interactive boxes for the home menu 
+#' @param id to connect each inputs and the output in the same session 
+#' @return boxes for the menu
 HomemenuInput_body <- function(id){
   ns = NS(id)
   fluidRow(
@@ -131,9 +131,9 @@ HomemenuInput_body <- function(id){
   )
 }
 
-#'@description 
-#'@param path 
-#'@return 
+#' @description this function is needed to visualize the interactive boxes of the menu
+#' @param parameters of a shiny module 
+#' @return allow the interactive boxes for the menu
 HomemenuOutput <- function(input, output, session){
   ns <- session$ns
 }

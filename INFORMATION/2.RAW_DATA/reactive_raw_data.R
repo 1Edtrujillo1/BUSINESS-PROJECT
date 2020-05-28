@@ -1,14 +1,14 @@
-#'@param inputId
-#'@param label 
-#'@param value 
+#' @description generate a datatable to manipulate in the application
+#' @param id to connect each inputs and the output in the same session 
+#' @return datatable to visualize
 raw_dataInput_body <- function(id){
   ns = NS(id)
   DT::DTOutput(ns("origTable")) 
 }
 
-#'@param inputId
-#'@param label 
-#'@param value 
+#' @description define the necessary parammeters to manipulate the datatable in the application
+#' @param id to connect each inputs and the output in the same session  
+#' @return inputs to manipulate the datatable in the application
 raw_dataInput_rightsidebar <- function(id){
   ns = NS(id) 
   fluidRow( 
@@ -33,9 +33,9 @@ raw_dataInput_rightsidebar <- function(id){
   )
 }
 
-#'@param inputId
-#'@param label 
-#'@param value 
+#' @description Creation of interactive clickable boxes to manipulate the datatable in the application
+#' @param parameters of a shiny module 
+#' @return boxes with editable parts of the datatable
 raw_dataOutput <- function(input, output, session, text_dataset = reactive("")) {
   data <- reactive({
     if(is.null(input$selectdataset)) return(NULL)
