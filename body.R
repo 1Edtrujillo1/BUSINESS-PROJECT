@@ -9,81 +9,6 @@ body <- dashboardBody(
     theme = "grey_dark"
   ),
   
-  # Add boxes for the home header options -----------------------------------
-  conditionalPanel(
-    condition = "input.basemenu == 'Home' && input.leftbar == 'presentation'",
-    fluidRow(
-      column(
-        width = 6,
-        offset = 3,
-        boxPlus(
-          title = "Home",
-          closable = FALSE,
-          collapsible = TRUE,
-          width = NULL,
-          status = "danger",
-          solidHeader = TRUE,
-          enable_dropdown = TRUE,
-          dropdown_icon = "info",
-          dropdown_menu = dropdownItemList(
-            dropdownItem(url = "https://trello.com/jorgeeduardotrujillovelazquez/boards", name = "trello"),
-            dropdownDivider(), #create a line space
-            dropdownItem(url = "#", name = "item1"),
-            dropdownItem(url = "#", name = "tem2"),
-          ),
-          box(
-            width = NULL,
-            title = "Pages Information",
-            status = NULL,
-            socialButton(
-              url = "https://trello.com/",
-              type = "trello"
-            ),
-            socialButton(
-              url = "http://dropbox.com",
-              type = "dropbox"
-            ),
-            socialButton(
-              url = "http://github.com",
-              type = "github"
-            )
-          ))
-      ))),
-  
-  conditionalPanel(
-    condition = "input.basemenu == 'Personal Information' && input.leftbar == 'presentation'",
-    fluidRow(
-      column(
-        width = 6,
-        offset = 3,# to aign to center
-        shinydashboardPlus::flipBox(
-          id = 3,
-          main_img = "https://image.flaticon.com/icons/svg/149/149076.svg",
-          header_img = "https://image.flaticon.com/icons/svg/119/119598.svg",
-          front_title = "Eduardo Trujillo",
-          back_title = "About Eduardo",
-          hr(), #Line space
-          "More than 2 years of experience in Data Science Areas",
-          back_content = tagList(
-            column(
-              width = 6,
-              offset = 3,# to aign to center
-              "SUPER"))
-        )
-      ))),
-  
-  conditionalPanel(
-    condition = "input.basemenu == 'Additional Information' && input.leftbar == 'presentation'",
-    fluidRow(
-      column(
-        width = 6,
-        offset = 3,
-        box(
-          title = "Additional Information",
-          status = "primary"
-        )
-      ))),
-  
   # Taggle sidebar information ----------------------------------------------
   
   tabItems(
@@ -91,7 +16,7 @@ body <- dashboardBody(
     # Presentation Page
     tabItem(
       tabName = "presentation",
-      "Presentation of the Page"
+      HomemenuInput_body("menu")
     ),
     
     # Raw Data

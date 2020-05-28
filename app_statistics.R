@@ -6,8 +6,10 @@ map(c("shiny", "shinydashboard", "dashboardthemes", "shinydashboardPlus", "shiny
       "haven", "readxl", "lubridate"), 
     require, character.only = TRUE)
 
-map(c("INFORMATION/RAW_DATA/raw_data.R", "INFORMATION/RAW_DATA/reactive_raw_data.R", 
-      "INFORMATION/RAW_DATA/additional_raw_data.R"),
+source("INFORMATION/1.MENU/reactive_menu.R")
+
+map(c("INFORMATION/2.RAW_DATA/raw_data.R", "INFORMATION/2.RAW_DATA/reactive_raw_data.R", 
+      "INFORMATION/2.RAW_DATA/additional_raw_data.R"),
     source)
 
 map(c("header.R", "sidebar.R", "body.R", "rightsidebar.R",
@@ -25,23 +27,10 @@ server <- function(input, output) {
   
   options(shiny.maxRequestSize=100*1024^2) #accept files of MB bigger
   
-  # Create a Dynamic notifications for the header
-  
-  output$notificationMenu <- renderMenu({
-    
-    ntfcation <- apply(notifications_list(path = "INFORMATION/notifications.json"), 1,
-                       function(row){
-                         notificationItem(text = row[["TEXT"]],
-                                          href = row[["HREF"]],
-                                          status = row[["STATUS"]],
-                                          icon = icon(name = row[["ICON"]]))
-                       })
-    dropdownMenu(type = "notifications", .list = ntfcation)
-    
-  })
-  
-  ####### Raw Data ##########################
-  
+  # Sever of the header -----------------------------------------------------
+  notifications <- callModule(module = NotificationmenuOutput, id = "notifications")
+  menu <- callModule(module = HomemenuOutput, id = "menu")
+  # Server of the Raw Data --------------------------------------------------
   raw_data <- callModule(module = raw_dataOutput, id = "raw_data")
   
   ####### Statistical Distributions ##########################
