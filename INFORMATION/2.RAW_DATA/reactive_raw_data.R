@@ -21,7 +21,7 @@ raw_dataInput_rightsidebar <- function(id){
     ),
     fileInput(inputId = ns("selectdataset"), label = "Select a file to edit",
               multiple = FALSE,
-              accept = c(",sas7bdat", ".rds", ".txt", ".csv", ".xls", ".xlsx")
+              accept = c(".sas7bdat", ".rds", ".txt", ".csv", ".xls", ".xlsx")
     ),
     tagList(
       actionButton(inputId = ns("editData"), label = "Edit Data", icon = icon(name = "wrench", lib = "glyphicon")),
@@ -99,6 +99,7 @@ raw_dataOutput <- function(input, output, session, text_dataset = reactive("")) 
           uiOutput(ns("edit_data")), 
           easyClose = TRUE, 
           footer = tagList( 
+            actionButton(inputId = ns("delete_cols"), label = "Delete Columns", icon = icon(name = "trash", lib = "glyphicon")),
             actionButton(inputId = ns("update"), label = "Update", icon = icon(name = "ok", lib ="glyphicon")),
             modalButton(label = "Close", icon = icon(name = "eject", lib ="glyphicon")))
         ))
@@ -254,5 +255,48 @@ raw_dataOutput <- function(input, output, session, text_dataset = reactive("")) 
       updateTextInput(session, inputId = "result",value = "updated")
     }
   })
+  ##
+  # Delete Columns ----------------------------------------------------------
+  observeEvent(input$delete_cols,{
+    id_col <- input$origTable_columns_selected
+    DeleteCOLS()
+    updateNumericInput(session, inputId = "page", value = (id_col-1)%/%10+1) 
+  })
+  DeleteCOLS <- reactive({
+    input$delete_cols
+    ns <- session$ns
+    showModal(
+      modalDialog(
+        title = "Delete Columns",
+        uiOutput(ns("delete_columns")),
+        easyClose = TRUE,
+        footer = tagList(
+          actionButton(inputId = ns("delete_colss"), label = "Delete",
+                       icon = icon(name = "trash", lib = "glyphicon")),
+          modalButton(label = "Close", icon = icon(name = "eject", lib ="glyphicon")))
+      ))
+  })
+  output$delete_columns <- renderUI({
+    ns <- session$ns
+    checkboxGroupInput(inputId = ns("var_name"), label = NULL,
+                       choices = colnames(df()), selected = NULL)
+  })
+  # # Observer for the button delete columns --------------------------------
+  observeEvent(input$delete_colss,{
+    df <- df() %>% as.data.table()
+    delete_colss_func <- function(var = NULL, df){
+      if(is.null(var)) df
+      else df[,(var):=NULL]
+    }
+    delete_col <- c()
+    if(input$result == "delete_col"){
+      delete_col1 <<- delete_colss_func(var = input$var_name, df = df) %>% as.data.frame()
+      updateTextInput(session, inputId = "result", value = "delete_col1")
+    }else{
+      delete_col <<- delete_colss_func(var = input$var_name, df = df) %>% as.data.frame()
+      updateTextInput(session, inputId = "result", value = "delete_col")
+    }
+  })
+  
   
 }
