@@ -124,10 +124,47 @@ HomemenuInput_body <- function(id){
           width = 6,
           offset = 3,
           box(
-            title = "Additional Information",
-            status = "primary"
-          )
-        )))
+            title = "Used Packages",
+            status = "success",
+            width = NULL,
+            userList(
+              userListItem(
+                src = "https://www.rstudio.com/wp-content/uploads/2014/04/shiny.png", 
+                user_name = "Shiny"
+              ),
+              userListItem(
+                src = "https://pbs.twimg.com/media/D4zzw_EX4AgcXjt?format=png&name=small", 
+                user_name = "data.table"
+              ),
+              userListItem(
+                src = "https://d33wubrfki0l68.cloudfront.net/071952491ec4a6a532a3f70ecfa2507af4d341f9/c167c/images/hex-dplyr.png", 
+                user_name = "dplyr"
+              ),
+              userListItem(
+                src = "https://rstudio.com/wp-content/uploads/2014/04/stringr.png", 
+                user_name = "stringr"
+              ),
+              userListItem(
+                src = "https://rstudio.com/wp-content/uploads/2014/04/purrr.png", 
+                user_name = "purrr"
+              ),
+              userListItem(
+                src = "https://rstudio.com/wp-content/uploads/2014/04/lubridate.png", 
+                user_name = "lubridate"
+              ),
+              userListItem(
+                src = "https://rstudio.com/wp-content/uploads/2014/04/ggplot2.png", 
+                user_name = "ggplot2"
+              ),
+              userListItem(
+                src = "https://wooiljeong.github.io/assets/img/post_img/2019-09-30-python_plotly/img_plotly_logo.PNG", 
+                user_name = "plotly"
+              ),
+              userListItem(
+                src = "https://rstudio.com/wp-content/uploads/2014/04/tidyverse.png", 
+                user_name = "tidyverse"
+              )
+            )))))
   )
 }
 
