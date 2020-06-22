@@ -64,6 +64,9 @@ raw_dataOutput <- function(input, output, session, text_dataset = reactive("")) 
     DT:: datatable(
       data = df(), 
       style = 'bootstrap',
+      filter = list(position = 'top', clear = FALSE),
+      options = list(
+        autoWidth = TRUE),
       editable = "cell") 
   })
   proxy <- dataTableProxy("origTable") 
@@ -120,7 +123,6 @@ raw_dataOutput <- function(input, output, session, text_dataset = reactive("")) 
         actionButton(inputId = ns("end"), label = "", icon = icon(name = "forward",lib = "glyphicon")),
         actionButton(inputId = ns("new"), label = "", icon = icon(name = "plus",lib = "glyphicon")),
         actionButton(inputId = ns("remove"), label = "", icon = icon(name = "trash", lib = "glyphicon")),
-        textInput2(inputId = ns("rowname"), label = "Row Name", value = rownames(d)[input$no], width = 150), 
         selectInput2(inputId = ns("width"), label = "input width", choices = c(170, 250, 350, 450, 550), selected = input$width2, width = 80),
         hr() 
       ) 
@@ -285,7 +287,7 @@ raw_dataOutput <- function(input, output, session, text_dataset = reactive("")) 
   observeEvent(input$delete_colss,{
     df <- df() %>% as.data.table()
     delete_colss_func <- function(var = NULL, df){
-      if(is.null(var)) df
+      if(is.null(var)) df # if we don´t selec any variable
       else df[,(var):=NULL]
     }
     delete_col <- c()
@@ -297,6 +299,107 @@ raw_dataOutput <- function(input, output, session, text_dataset = reactive("")) 
       updateTextInput(session, inputId = "result", value = "delete_col")
     }
   })
-  
+  ##
+  # Outliers --------------------------------------------------------------
+  observeEvent(input$outlierId,{
+    DeleteOUTLIERS()
+  })
+  DeleteOUTLIERS <- reactive({
+    input$outlierId
+    ns <- session$ns
+    if(is.null(data())){
+      showModal(
+        modalDialog(
+          title = "Delete Outliers",
+          "Please enter a valid dataset",
+          easyClose = TRUE,
+          footer = modalButton(label = "Close", icon = icon(name = "eject", lib ="glyphicon"))
+        ))
+    }else{
+      showModal(
+        modalDialog(
+          title = "Delete Outliers",
+          uiOutput(ns("delete_outliers")),
+          easyClose = TRUE,
+          footer = tagList(
+            actionButton(inputId = ns("helpoutliers"), label = "Help",
+                         icon = icon(name = "question", lib = "font-awesome")),
+            actionButton(inputId = ns("delete_outlierss"), label = "Delete",
+                         icon = icon(name = "erase", lib = "glyphicon")),
+            modalButton(label = "Close", icon = icon(name = "eject", lib ="glyphicon")))
+        ))
+    }
+  })
+  output$delete_outliers <- renderUI({
+    ns <- session$ns
+    checkboxGroupInput(inputId = ns("vars_factor_outlier"), label = "Factor Variables:",
+                       choices = classes_vector(data_type = "factor", 
+                                                df = copy(df()) %>% as.data.table()),
+                       selected = NULL)
+  })
+  # # Help Outliers -----------------------------------------------------------
+  observeEvent(input$helpoutliers,{
+    HELPOUTLIERS()
+  })
+  HELPOUTLIERS <- reactive({
+    input$helpoutliers
+    ns <- session$ns
+    showModal(
+      modalDialog(
+        title = "Best Factor Variable",
+        uiOutput(ns("help_outliers_intro")),
+        easyClose = TRUE,
+        footer = modalButton(label = "Close", icon = icon(name = "eject", lib ="glyphicon"))
+      ))
+  })
+  output$help_outliers_intro <- renderUI({
+    ns <- session$ns
+    variables_numbers_intro <- list(selectInput(inputId = ns("int_num_fact"),
+                                                label = "Integer or Numeric Variable",
+                                                choices = classes_vector(data_type = c("integer", "numeric"), 
+                                                                         df = copy(df()) %>% as.data.table()),
+                                                multiple = FALSE),
+                                    hr(),
+                                    uiOutput(ns("help_outliers")))
+    do.call(what = tagList, args = variables_numbers_intro)
+  })
+  # # # Add another UI to use the int_num_fact ID
+  output$help_outliers <- renderUI({
+    ns <- session$ns
+    recomended_variables <- recomended_level_outliers(df = copy(df()) %>% as.data.table())
+    
+    variables_numbers <- pmap(list(i = 1:length(recomended_variables)), function(i){
+      
+      recomended_variable <- pluck(recomended_variables, i)
+      
+      pmap(list(j = 1:length(recomended_variable)), function(j){
+        
+        if(length(names(recomended_variables)[[i]]) < 1) "You don´t have any factor variable available"
+        
+        else if(input$int_num_fact == names(recomended_variables)[[i]]){
+          numericInput2(inputId = ns(names(recomended_variable)[[j]]), 
+                        label = names(recomended_variable)[[j]], 
+                        value = recomended_variable[[j]])
+        }else NULL
+      })
+    })
+    do.call(what = tagList, args = variables_numbers)
+  })
+  # # Observer for the button Outliers --------------------------------------
+  observeEvent(input$delete_outlierss,{
+    df <- df() %>% as.data.table()
+    delete_outlierss_func <- function(var = NULL, df){
+      if(is.null(var)) df
+      else delete_outliers(df = df, level = var)
+    }
+    outliers_col <- c()
+    if(input$result == "outliers_col"){
+      outliers_col1 <<- delete_outlierss_func(var = input$vars_factor_outlier, df = df) %>% as.data.frame()
+      updateTextInput(session, inputId = "result", value = "outliers_col1")
+    }else{
+      outliers_col <<- delete_outlierss_func(var = input$vars_factor_outlier, df = df) %>% as.data.frame()
+      updateTextInput(session, inputId = "result", value = "outliers_col")
+    }
+  })
   
 }
