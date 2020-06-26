@@ -3,7 +3,7 @@ library(purrr)
 
 map(c("shiny", "shinydashboard", "dashboardthemes", "shinydashboardPlus", "shinyWidgets", "mixdist","DT",
       "jsonlite", "data.table", "dplyr", "bit64", "stringr", "scales", "ggplot2", "plotly",
-      "haven", "readxl", "lubridate"), 
+      "haven", "readxl", "lubridate", "tidyr"), 
     require, character.only = TRUE)
 
 source("INFORMATION/1.MENU/reactive_menu.R")

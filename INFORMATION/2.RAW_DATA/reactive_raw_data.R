@@ -250,10 +250,12 @@ raw_dataOutput <- function(input, output, session, text_dataset = reactive("")) 
     }
     updated <- c()
     if(input$result=="updated"){
-      updated_1 <<- df 
+      updated_1 <<- copy(df) %>% as.data.table() %>% 
+        .[,lapply(.SD, assign_data_type), .SDcols = names(df)] %>% as.data.frame()
       updateTextInput(session, inputId = "result",value ="updated_1")
     } else{
-      updated<<- df
+      updated <<- copy(df) %>% as.data.table() %>% 
+        .[,lapply(.SD, assign_data_type), .SDcols = names(df)] %>% as.data.frame()
       updateTextInput(session, inputId = "result",value = "updated")
     }
   })
@@ -374,7 +376,7 @@ raw_dataOutput <- function(input, output, session, text_dataset = reactive("")) 
       
       pmap(list(j = 1:length(recomended_variable)), function(j){
         
-        if(length(names(recomended_variables)[[i]]) < 1) "You don´t have any factor variable available"
+        if(length(names(recomended_variables)[[i]]) < 1) "You do not have any factor variable available"
         
         else if(input$int_num_fact == names(recomended_variables)[[i]]){
           numericInput2(inputId = ns(names(recomended_variable)[[j]]), 
@@ -401,5 +403,63 @@ raw_dataOutput <- function(input, output, session, text_dataset = reactive("")) 
       updateTextInput(session, inputId = "result", value = "outliers_col")
     }
   })
+  ##
+  # Adding ID ---------------------------------------------------------------
+  observeEvent(input$CreateId,{
+    AddID()
+  })
+  AddID <- reactive({
+    input$CreateId
+    ns <- session$ns
+    if(is.null(data())){
+      showModal(
+        modalDialog(
+          title = "Adding unique ID variable",
+          "Please enter a valid dataset",
+          easyClose = TRUE,
+          footer = modalButton(label = "Close",  icon = icon(name = "eject", lib ="glyphicon"))
+        ))
+    }else{
+      showModal(
+        modalDialog(
+          title = "Adding unique ID variable",
+          uiOutput(ns("add_id")),
+          easyClose = TRUE,
+          footer = tagList(
+            actionButton(inputId = ns("add_idd"), label = "Add ID",
+                         icon = icon(name = "tag", lib = "glyphicon")),
+            modalButton(label = "Close", icon = icon(name = "eject", lib ="glyphicon")))
+        ))
+    }
+  })
+  output$add_id <- renderUI({
+    ns <- session$ns
+    id_inputs <- list(
+      selectInput(inputId = ns("optimal_vars_factor"), label = "Optimal Factor Variable(s):",
+                  choices = optimal_factor_variables(df = copy(df()) %>% as.data.table())),
+      hr(),
+      selectInput(inputId = ns("vars_factor_id"), label = "Select a Factor Variable:",
+                  choices = classes_vector(data_type = "factor",
+                                           df = copy(df()) %>% as.data.table()),
+                  selected = NULL))
+    do.call(what = tagList, args = id_inputs)
+  })
+  # # Observer for the button ID --------------------------------------------
+  observeEvent(input$add_idd,{
+    df <- df() %>% as.data.table()
+    add_idd_func <- function(var = NULL, df){
+      if(is.null(var)) df
+      else key_creation(df = df, level = var)
+    }
+    idd_col <- c()
+    if(input$result == "idd_col"){
+      idd_col1 <<-  add_idd_func(var = input$vars_factor_id, df = df) %>% as.data.frame()
+      updateTextInput(session, inputId = "result", value = "idd_col1")
+    }else{
+      idd_col <<-  add_idd_func(var = input$vars_factor_id, df = df) %>% as.data.frame()
+      updateTextInput(session, inputId = "result", value = "idd_col")
+    }
+  })
+  
   
 }
