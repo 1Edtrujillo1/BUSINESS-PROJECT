@@ -1,9 +1,10 @@
 # Loading Required Information --------------------------------------------
 library(purrr)
 
-map(c("shiny", "shinydashboard", "dashboardthemes", "shinydashboardPlus", "shinyWidgets", "mixdist","DT",
-      "jsonlite", "data.table", "dplyr", "bit64", "stringr", "scales", "ggplot2", "plotly",
-      "haven", "readxl", "lubridate", "tidyr"), 
+map(c("shiny", "shinydashboard", "dashboardthemes", "shinydashboardPlus", 
+      "shinyWidgets", "mixdist","DT", "jsonlite", "data.table", "dplyr", 
+      "bit64", "stringr", "scales", "ggplot2", "plotly", "haven", "readxl", 
+      "lubridate", "tidyr", "DBI", "odbc"), 
     require, character.only = TRUE)
 
 source("INFORMATION/1.MENU/reactive_menu.R")
@@ -40,7 +41,7 @@ server <- function(input, output) {
   # Statistical Distributions -----------------------------------------------
   discrete_distributions <- callModule(module = discrete_distOutput, id = "discrete_distributions")
   
- 
+  
   
 }
 

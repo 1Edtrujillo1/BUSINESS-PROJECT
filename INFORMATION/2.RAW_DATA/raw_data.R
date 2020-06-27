@@ -384,7 +384,6 @@ optimal_factor_variables <- function(df){
 #' @param level=factor_variable
 #' @return key for a dataset (with the intention that in the future we use this
 #' variable as an ID for merges)
-
 key_creation <- function(df, level){
   
   if(length(classes_vector(data_type = "Date", df = df)) == 0){ #NO DATES
@@ -403,8 +402,42 @@ key_creation <- function(df, level){
       str_c(day(day_variable[,get(day_name)]), 
             month(day_variable[,get(day_name)]), 
             year(day_variable[,get(day_name)])),
-      match(get(level),unique(get(level)))
+      match(get(level),unique(get(level))), sep = "_"
     )]
   }
 }
 #A <- key_creation(df = copy(df), level = "SPECIES")
+
+
+# Push Table to SQL Server ------------------------------------------------
+
+#' @description this function stablish a connection with a server, but if I write
+#' wrong a parameter or if there is no server connection then return a character
+#' string "Incorrect connection"
+#' @param DBI parameters 
+#' @return connection between R and a server in SQL Server
+SQL_connection <- possibly(function(dsn, database, uid, pwd, port){
+  DBI::dbConnect(odbc::odbc(),
+                 dsn = dsn,
+                 Database = database,
+                 UID = uid,
+                 PWD = pwd,
+                 Port = port)
+}, otherwise = "Incorrect connection") 
+
+#' @description copy a dataset that we have and then select the variables that
+#' we want of the dataset and finally push this dataset to SQL Server
+#' @param connection DBI connection
+#' @param name names that we want to give to the table in SQL Server
+#' @param df dataset to import  
+#' @param variables selected variables of the dataset
+#' @return push table to SQL Server
+push_sql_table <- function(connection, name, df, variables){
+  
+  df <- copy(df) %>% as.data.table %>% 
+    .[,variables, with = FALSE]
+  
+  DBI::dbWriteTable(conn = connection,  name = name, value = df,
+                    overwrite = TRUE)
+}
+
