@@ -1,18 +1,27 @@
+rm(list = ls())
+
 # Loading Required Information --------------------------------------------
 library(purrr)
 
 map(c("shiny", "shinydashboard", "dashboardthemes", "shinydashboardPlus", 
       "shinyWidgets", "mixdist","DT", "jsonlite", "data.table", "dplyr", 
       "bit64", "stringr", "scales", "ggplot2", "plotly", "haven", "readxl", 
-      "lubridate", "tidyr", "DBI", "odbc"), 
+      "lubridate", "tidyr", "DBI", "odbc", "glue"), 
     require, character.only = TRUE)
 
 source("INFORMATION/1.MENU/reactive_menu.R")
 
 map(
   str_c("INFORMATION/2.RAW_DATA", 
-        c("raw_data.R", "reactive_raw_data.R", "additional_raw_data.R"), sep = "/"),
+        c("raw_data.R", "reactive_raw_data.R", "additional_raw_data.R"), 
+        sep = "/"),
   source)
+
+map(
+  str_c("INFORMATION/2.1.PULL_DATA",
+        c("pull_data.R", "reactive_pull_data.R"), sep = "/"),
+  source
+)
 
 map(
   str_c("INFORMATION/4.STATISTICAL_DISTRIBUTIONS",
@@ -33,13 +42,19 @@ server <- function(input, output) {
   options(shiny.maxRequestSize=100*1024^2) #accept files of MB bigger
   
   # Sever of the header -----------------------------------------------------
-  notifications <- callModule(module = NotificationmenuOutput, id = "notifications")
-  menu <- callModule(module = HomemenuOutput, id = "menu")
+  notifications <- callModule(module = NotificationmenuOutput, 
+                              id = "notifications")
+  menu <- callModule(module = HomemenuOutput, 
+                     id = "menu")
   # Server of the Raw Data --------------------------------------------------
-  raw_data <- callModule(module = raw_dataOutput, id = "raw_data")
-  
+  raw_data <- callModule(module = raw_dataOutput, 
+                         id = "raw_data")
+  # Server of the General Reports -------------------------------------------
+  descriptive_statistics <- callModule(module = pull_dataOutput, #change
+                                       id = "pull_data")
   # Statistical Distributions -----------------------------------------------
-  discrete_distributions <- callModule(module = discrete_distOutput, id = "discrete_distributions")
+  discrete_distributions <- callModule(module = discrete_distOutput, 
+                                       id = "discrete_distributions")
   
   
   

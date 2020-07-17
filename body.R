@@ -24,9 +24,9 @@ body <- dashboardBody(
       raw_dataInput_body("raw_data")
     ),
     
-    # Descriptive Statistics --------------------------------------------------
-    tabItem(tabName = "DS",
-            "Modify1"
+    # General Reports ---------------------------------------------------------
+    tabItem(tabName = "GR",
+            pull_dataInput_body("pull_data") #change
     ),
     
     # Statistical Distributions -----------------------------------------------

@@ -16,6 +16,11 @@ rightsidebar <- rightSidebar(
     ## Raw Data ----------------------------------------------------------------
     conditionalPanel(condition = "input.leftbar == 'rawdata'",
                      raw_dataInput_rightsidebar("raw_data")
+    ),
+    
+    ## General Reports ---------------------------------------------------------
+    conditionalPanel(condition = "input.leftbar == 'GR'",
+                     pull_dataInput_rightsidebar("pull_data") #change
     )
   ),
   

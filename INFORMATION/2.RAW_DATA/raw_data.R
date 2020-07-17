@@ -437,7 +437,9 @@ push_sql_table <- function(connection, name, df, variables){
   df <- copy(df) %>% as.data.table %>% 
     .[,variables, with = FALSE]
   
-  DBI::dbWriteTable(conn = connection,  name = name, value = df,
+  DBI::dbWriteTable(conn = connection,  
+                    name = str_c("PERSONAL", name, sep = "_"), 
+                    value = df,
                     overwrite = TRUE)
 }
 

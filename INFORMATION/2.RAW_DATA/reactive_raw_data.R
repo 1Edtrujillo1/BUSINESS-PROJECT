@@ -557,13 +557,13 @@ raw_dataOutput <- function(input, output, session, text_dataset = reactive("")) 
   })
   output$connection_sql <- renderUI({
     ns <- session$ns
-    sql_connections <- list(
+    sql_connection <- list(
       textInput(inputId = ns("dsn"), label = "Data Source Name"),
       textInput(inputId = ns("database"), label = "Database"),
       textInput(inputId = ns("uid"), label = "User Identifier"),
       passwordInput(inputId = ns("pwd"), label = "Password"),
       textInput(inputId = ns("port"), label = "Port"))
-    do.call(what = tagList, args = sql_connections)
+    do.call(what = tagList, args = sql_connection)
   })
   # # Define Dataset ----------------------------------------------------------
   observeEvent(input$pushsql,{

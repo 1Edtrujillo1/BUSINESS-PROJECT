@@ -28,15 +28,26 @@ sidebar <- dashboardSidebar(
     
     # Descriptive Statistics options ------------------------------------------
     menuItem(
-      text = "Descriptive Statistics",
-      tabName = "DS",
-      icon = icon(name = "calculator", class = "fas fa-calculator", lib = "font-awesome")
+      text = "General Inforamation",
+      icon = icon(name = "calculator", class = "fas fa-calculator", 
+                  lib = "font-awesome"),
+      # Reports
+      menuSubItem(
+        text = "General reports",
+        tabName = "GR",
+        icon = icon("angle-right")),
+      # Descriptive Statistics 
+      menuSubItem(
+        text = "Descriptive Statistics",
+        tabName = "DS",
+        icon = icon("angle-right"))
     ),
     
     # Statistical Distributions options ---------------------------------------
     menuItem(
       text = "Statistical Distributions",
-      icon = icon(name = "chart-bar", class = "fas fa-chart-bar", lib = "font-awesome"),
+      icon = icon(name = "chart-bar", class = "fas fa-chart-bar", 
+                  lib = "font-awesome"),
       # Discrete Distributions 
       menuSubItem(
         text = "Discrete Random Variable",

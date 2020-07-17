@@ -1,7 +1,7 @@
 header <- dashboardHeaderPlus(
   
   # Add a title -------------------------------------------------------------
-  title = span(tagList(icon("building"), "Eduardo Company")),
+  title = span(tagList(icon("building"), "Demo")),
   
   # Add a Dynamic Notifications ---------------------------------------------
   NotificationmenuInput_header("notifications"),
