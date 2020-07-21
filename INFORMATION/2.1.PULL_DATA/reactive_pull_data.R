@@ -3,16 +3,23 @@ pull_dataInput_body <- function(id){
   DT::DTOutput(ns("pulltable"))
 }
 
-
+#' @description define the necessary parammeters to pull dataset from an SQL 
+#' server in the application
+#' @param id to connect each inputs and the output in the same session  
+#' @return inputs to pull the final datatable in the application
 pull_dataInput_rightsidebar <- function(id){
   ns = NS(id)
   fluidRow(
+    
     actionButton(inputId = ns("pull"), label = "Pull Dataset",
                  icon = icon(name = "fas fa-file-download",
                              lib = "font-awesome")))
 }
 
-
+#' @description Creation of interactive clickable boxes to pull the final datatable 
+#' in the application
+#' @param parameters of a shiny module 
+#' @return boxes with sql parameters 
 pull_dataOutput <- function(input, output, session){
   
   # Connection --------------------------------------------------------------
@@ -202,10 +209,10 @@ pull_dataOutput <- function(input, output, session){
           TABLE_name <- eval(parse(text = inputId_TABLE))
           variables <- sql_tables()[[TABLE_name]]
           
-          message(glue("inputIdS_table$VARIABLES{index}"))
+          message(glue("{inputIdS_table$VARIABLES}{index}"))
           print(variables)
           
-          selectInput(inputId = ns(glue("inputIdS_table$VARIABLES{index}")),
+          selectInput(inputId = ns(glue("{inputIdS_table$VARIABLES}{index}")),
                       label = glue("VARIABLES OF TABLE {index}"),
                       choices = variables,
                       multiple = TRUE)
@@ -225,11 +232,10 @@ pull_dataOutput <- function(input, output, session){
           message(glue("{inputIdS_table$VARIABLES}{index}"))
           print(variables_withoutID)
           
-          selectInput(inputId = ns(glue("inputIdS_table$VARIABLES{index}")),
+          selectInput(inputId = ns(glue("{inputIdS_table$VARIABLES}{index}")),
                       label = glue("VARIABLES OF TABLE {index}"),
                       choices = variables_withoutID,
-                      multiple = TRUE)
-        })
+                      multiple = TRUE)})
       }
       do.call(what = tagList, args = name_variables)
     }
@@ -248,8 +254,7 @@ pull_dataOutput <- function(input, output, session){
       selectInput2(inputId = ns(glue("{inputIdS_table$JOIN}")), label = NULL,
                    choices = c("Inner Join" = "innerjoin",
                                "Left Join" = "leftjoin",
-                               "Outer Join" = "outerjoin",
-                               "Anti Join" = "antijoin"),
+                               "Outer Join" = "outerjoin"),
                    multiple = FALSE,
                    width = 115)
     }else NULL
@@ -270,6 +275,72 @@ pull_dataOutput <- function(input, output, session){
         session = session,
         title = "Success !!",
         text = "All in order",
+        type = "success")
+    }
+  })
+  
+  # # Pull Dataset ----------------------------------------------------------
+  FINAL_DF <- reactive({
+    
+    select_tables <- glue("inputIdS_table$TABLE{1:numberTables()}")
+    
+    tables_information <- imap(select_tables, function(x, index){
+      
+      Id_tables <- glue("input${inputIdS_table$TABLE}{index}")
+      TABLES <- eval(parse(text = Id_tables))
+      
+      Id_id <- glue("input${inputIdS_table$ID}{index}")
+      ID <- eval(parse(text = Id_id))
+      
+      Id_variables <- glue("input${inputIdS_table$VARIABLES}{index}")
+      VARS <- eval(parse(text = Id_variables))
+      
+      list(
+        TABLE = TABLES,
+        ID = ID,
+        VARIABLES = VARS
+      ) %>% return()
+    })  
+    
+    Id_join <- glue("input${inputIdS_table$JOIN}")
+    JOIN <- eval(parse(text = Id_join))
+    
+    FINAL_DF <- join_tables(connection = connection_sql_reactive(),
+                            tables = map(tables_information, "TABLE"),
+                            variables = map(tables_information, "VARIABLES"),
+                            id = map(tables_information, "ID"),
+                            join = JOIN)
+    
+    message("tables_information")
+    message(class(tables_information))
+    print(tables_information)
+    
+    message("FINAL_DF")
+    message(class(FINAL_DF))
+    print(FINAL_DF)
+    FINAL_DF
+  })
+  
+  observeEvent(input$pull_sqll,{
+    
+    req(FINAL_DF())
+    
+    if(is.null(FINAL_DF())|is.character(FINAL_DF()) | (FINAL_DF()[,.N] == 0)){
+      sendSweetAlert(
+        session = session,
+        title = "Error",
+        text = "Pull Dataset not completed",
+        type = "error")
+    }else{
+      saveRDS(object = FINAL_DF(), file = "INFORMATION/FILES/saved.rds")
+      
+      print(pmap(list(map(names(FINAL_DF()), ~FINAL_DF()[,get(.x)]) %>% 
+                        set_names(names(FINAL_DF()))),~class(.x)))
+      
+      sendSweetAlert(
+        session = session,
+        title = "Success !!",
+        text = "Pull Dataset completed",
         type = "success")
     }
   })

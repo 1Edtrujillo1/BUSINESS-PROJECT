@@ -13,6 +13,15 @@ special_chrs = c('Š'='S', 'š'='s', 'Ž'='Z', 'ž'='z', 'À'='A', 'Á'='A', 'Â
                  'ö'='o', 'ø'='o', 'ù'='u', 'ú'='u', 'û'='u', 'ý'='y', 'ý'='y',
                  'þ'='b', 'ÿ'='y', 'ã'='a')
 
+#' @description All the possible regex expressions for dates
+regex_dates <- c("^(?:[1-9]|0[1-9]|1[0-2])(?:\\/|\\-).{1,2}(?:\\/|\\-).{1,4}",
+                 "^(?:[1-9]|0[1-9]|1[0-2])(?:\\/|\\-).{1,4}(?:\\/|\\-).{1,2}",
+                 "^.{1,2}(?:\\/|\\-)(?:[1-9]|0[1-9]|1[0-2])(?:\\/|\\-).{1,4}",
+                 "^.{1,4}(?:\\/|\\-)(?:[1-9]|0[1-9]|1[0-2])(?:\\/|\\-).{1,2}",
+                 "^.{1,2}(?:\\/|\\-).{1,4}(?:\\/|\\-)(?:[1-9]|0[1-9]|1[0-2])",
+                 "^.{1,4}(?:\\/|\\-).{1,2}(?:\\/|\\-)(?:[1-9]|0[1-9]|1[0-2])")
+names(regex_dates) <- c("mdy", "myd", "dmy", "ymd", "dym", "ydm")
+
 #' @description: 
 #' @1.Import a dataset of any type of termination (.sas, .rds, .txt, .csv, .xls, 
 #' .xlsx)
@@ -81,10 +90,20 @@ assign_data_type <- function(variable){
   
   values_type <- map(variable,function(variable){
     if(is.na(variable)) NA
-    else if(str_detect(string = variable, pattern = "[A-Z]+")) "character"
-    else if(str_detect(string = variable, pattern = "[0-9]+[.][0-9]+")) "numeric"
-    else if(str_detect(string = variable, pattern = ".+\\/.+\\/.+")) "date"
+    else if(str_detect(string = variable, 
+                       pattern = "(?:[A-Z]+|[a-z]+|(?![.]|[-])[:punct:]+)")) "character" #(?![.]|[-])[:punct:] every punctuation except . or -
+    else if(str_detect(string = variable, 
+                       pattern = "[0-9]+[.][0-9]+")) "numeric"
+    else if(str_detect(string = variable, 
+                       pattern = str_c("(?:",
+                                       str_c(".+\\/.+\\/.+", 
+                                             regex_dates, collapse = "|", 
+                                             sep = "|"),
+                                       ")"))) "date"
+    else if(str_detect(string = variable, 
+                       pattern = "(?:TRUE|FALSE)")) "logical"
     else if(is.Date(variable)) "date"
+    else if(is.logical(variable)) "logical"
     else "integer"}
   ) %>% flatten_chr() 
   
@@ -107,6 +126,7 @@ assign_data_type <- function(variable){
   else if(type == "numeric") variable <- as.numeric(variable)
   else if(type == "integer") variable <- as.integer(variable)
   else if(type == "factor") variable <- as.factor(variable)
+  else if(type == "logical") variable <- as.logical(variable)
   else if(type == "date") variable <- assign_date_type(variable = variable)
   
   variable
@@ -135,22 +155,22 @@ assign_date_type <- function(variable){
     date_type <- map_dfc(variable, function(variable){
       
       if(str_detect(string = variable, 
-                    pattern = "^(?:[1-9]|0[1-9]|1[0-2])\\/.{1,2}\\/.{1,4}"))
+                    pattern = regex_dates["mdy"]))
         variable <- mdy(variable)
       else if(str_detect(string = variable, 
-                         pattern = "^(?:[1-9]|0[1-9]|1[0-2])\\/.{1,4}\\/.{1,2}"))
+                         pattern = regex_dates["myd"]))
         variable <- myd(variable)
       else if(str_detect(string = variable, 
-                         pattern = "^.{1,2}\\/(?:[1-9]|0[1-9]|1[0-2])\\/.{1,4}"))
+                         pattern = regex_dates["dmy"]))
         variable <- dmy(variable)
       else if(str_detect(string = variable, 
-                         pattern = "^.{1,4}\\/(?:[1-9]|0[1-9]|1[0-2])\\/.{1,2}"))
+                         pattern = regex_dates["ymd"]))
         variable <- ymd(variable)
       else if(str_detect(string = variable, 
-                         pattern = "^.{1,2}\\/.{1,4}\\/(?:[1-9]|0[1-9]|1[0-2])"))
+                         pattern = regex_dates["dym"]))
         variable <- dym(variable)
       else if(str_detect(string = variable, 
-                         pattern = "^.{1,4}\\/.{1,2}\\/(?:[1-9]|0[1-9]|1[0-2])"))
+                         pattern = regex_dates["ydm"]))
         variable <- ydm(variable)
     })
     
