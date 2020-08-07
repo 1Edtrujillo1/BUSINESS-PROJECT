@@ -6,7 +6,8 @@ library(purrr)
 map(c("shiny", "shinydashboard", "dashboardthemes", "shinydashboardPlus", 
       "shinyWidgets", "mixdist","DT", "jsonlite", "data.table", "dplyr", 
       "bit64", "stringr", "scales", "ggplot2", "plotly", "haven", "readxl", 
-      "lubridate", "tidyr", "DBI", "odbc", "glue"), 
+      "lubridate", "tidyr", "DBI", "odbc", "glue", "arrangements", "formattable",
+      "sparkline"), 
     require, character.only = TRUE)
 
 source("INFORMATION/1.MENU/reactive_menu.R")
@@ -20,6 +21,12 @@ map(
 map(
   str_c("INFORMATION/2.1.PULL_DATA",
         c("pull_data.R", "reactive_pull_data.R"), sep = "/"),
+  source
+)
+
+map(
+  str_c("INFORMATION/3.REPORTS",
+        c("reports.R", "design_reports.R", "sparklines.R"), sep = "/"),
   source
 )
 

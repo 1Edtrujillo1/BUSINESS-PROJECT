@@ -122,6 +122,7 @@ iterative_merge <- function(dfs_list, key, ...){
   Reduce(function(x,y) merge(x, y, by = key, ...),
          x = dfs_list)
 }
+#df11 <- iterative_merge(dfs_list = dfs, key = "KEY")
 
 #' @SUBFUNCTION 
 #' @description This function is useful when we merge datasets and we have
@@ -158,7 +159,8 @@ unify_merge_columns <- function(df, keep.y = TRUE){
     df <- df
   }else df
 }
-
+# df_left <- unify_merge_columns(df = copy(df11), keep.y = TRUE)
+# df_right <- unify_merge_columns(df = copy(df11), keep.y = FALSE)
 
 
 

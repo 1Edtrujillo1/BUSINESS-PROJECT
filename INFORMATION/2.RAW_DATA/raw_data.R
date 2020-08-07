@@ -152,28 +152,31 @@ assign_date_type <- function(variable){
   else{
     variable <- as.character(variable)
     
-    date_type <- map_dfc(variable, function(variable){
+    date_type <- suppressMessages( #hide the message of creation of new variables ...1       ...2       ...3
       
-      if(str_detect(string = variable, 
-                    pattern = regex_dates["mdy"]))
-        variable <- mdy(variable)
-      else if(str_detect(string = variable, 
-                         pattern = regex_dates["myd"]))
-        variable <- myd(variable)
-      else if(str_detect(string = variable, 
-                         pattern = regex_dates["dmy"]))
-        variable <- dmy(variable)
-      else if(str_detect(string = variable, 
-                         pattern = regex_dates["ymd"]))
-        variable <- ymd(variable)
-      else if(str_detect(string = variable, 
-                         pattern = regex_dates["dym"]))
-        variable <- dym(variable)
-      else if(str_detect(string = variable, 
-                         pattern = regex_dates["ydm"]))
-        variable <- ydm(variable)
-    })
-    
+      map_dfc(variable, function(variable){
+        
+        if(str_detect(string = variable, 
+                      pattern = regex_dates["mdy"]))
+          variable <- mdy(variable)
+        else if(str_detect(string = variable, 
+                           pattern = regex_dates["myd"]))
+          variable <- myd(variable)
+        else if(str_detect(string = variable, 
+                           pattern = regex_dates["dmy"]))
+          variable <- dmy(variable)
+        else if(str_detect(string = variable, 
+                           pattern = regex_dates["ymd"]))
+          variable <- ymd(variable)
+        else if(str_detect(string = variable, 
+                           pattern = regex_dates["dym"]))
+          variable <- dym(variable)
+        else if(str_detect(string = variable, 
+                           pattern = regex_dates["ydm"]))
+          variable <- ydm(variable)
+      })
+    )
+      
     date_type <- gather(date_type, names(date_type),
                         key = "name_vars" , value = "date") %>% 
       data.table()
