@@ -12,7 +12,7 @@ sidebar <- dashboardSidebar(
   sidebarMenu(
     id = "leftbar",
     
-    # Presentation ------------------------------------------------------------
+    # Presentation Page -------------------------------------------------------
     menuItem(
       text = "Presentation",
       tabName = "presentation",
@@ -31,7 +31,7 @@ sidebar <- dashboardSidebar(
       text = "General Inforamation",
       icon = icon(name = "calculator", class = "fas fa-calculator", 
                   lib = "font-awesome"),
-      # Reports
+      # General Reports
       menuSubItem(
         text = "General reports",
         tabName = "GR",
@@ -104,8 +104,8 @@ sidebar <- dashboardSidebar(
     
     # Forcast options ---------------------------------------------------------
     menuItem(
-      text = "Forcast",
-      tabName = "forcast",
+      text = "Forecast",
+      tabName = "forecast",
       icon = icon("chart-line")
     )
   )

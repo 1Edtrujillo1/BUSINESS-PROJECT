@@ -13,15 +13,18 @@ rightsidebar <- rightSidebar(
     icon = "database",
     active = FALSE, #Se pueda mover entre los temas
     
-    ## Raw Data ----------------------------------------------------------------
+    # Raw Data ----------------------------------------------------------------
     conditionalPanel(condition = "input.leftbar == 'rawdata'",
                      raw_dataInput_rightsidebar("raw_data")
     ),
-    
-    ## General Reports ---------------------------------------------------------
+    # General Information -----------------------------------------------------
+    ## General Report ---------------------------------------------------------
     conditionalPanel(condition = "input.leftbar == 'GR'",
-                     pull_dataInput_rightsidebar("pull_data") #change
+                     pull_dataInput_rightsidebar(id = "pull_report") 
     )
+    # # Descriptive Statistics ------------------------------------------------
+    
+    
   ),
   
   # Filter Options ----------------------------------------------------------
@@ -31,12 +34,20 @@ rightsidebar <- rightSidebar(
     icon = "filter",
     active = FALSE,
     
-    ## Statistical Distributions -----------------------------------------------
-    # Discrete Distributions 
+    # General Information -----------------------------------------------------
+    ## General Report ---------------------------------------------------------
+    conditionalPanel(condition = "input.leftbar == 'GR'",
+                     reportInput_rightsidebar(id = "pull_report")
+    ),
+    # # Descriptive Statistics ------------------------------------------------
+    
+    
+    # Statistical Distributions ------------------------------------------------
+    # # Discrete Distributions ------------------------------------------------
     conditionalPanel(condition = "input.leftbar == 'SDiscrete'",
                      discrete_distInput_rightsidebar("discrete_distributions"),
     ),
-    # Continous Distributions 
+    # # Continous Distributions -----------------------------------------------
     conditionalPanel(condition = "input.leftbar == 'SDcontinous'",
                      selectInput(inputId = "continous", label = "Distribution",
                                  choices = c("Exponential", "Normal", "Gamma", 

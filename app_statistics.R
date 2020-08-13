@@ -26,7 +26,8 @@ map(
 
 map(
   str_c("INFORMATION/3.REPORTS",
-        c("reports.R", "design_reports.R", "sparklines.R"), sep = "/"),
+        c("reports.R", "design_reports.R", "sparklines.R",
+          "reactive_reports.R"), sep = "/"),
   source
 )
 
@@ -56,12 +57,23 @@ server <- function(input, output) {
   # Server of the Raw Data --------------------------------------------------
   raw_data <- callModule(module = raw_dataOutput, 
                          id = "raw_data")
-  # Server of the General Reports -------------------------------------------
-  descriptive_statistics <- callModule(module = pull_dataOutput, #change
-                                       id = "pull_data")
-  # Statistical Distributions -----------------------------------------------
+  
+  # Server General Information ----------------------------------------------
+  # # Server of the General Report ------------------------------------------
+  pull_data_report <- callModule(module = pull_dataOutput,
+                                 id = "pull_report")
+  pull_report <- callModule(module = reportOutput,
+                            id = "pull_report")
+  # # Server of Descriptive Statistics --------------------------------------
+  
+  
+  # Server for Statistical Distributions ------------------------------------
+  # # Server for Discrete Random Variable ----------------------------------
   discrete_distributions <- callModule(module = discrete_distOutput, 
                                        id = "discrete_distributions")
+  # # Server for Continous Random Variable ----------------------------------
+  
+  
   
   
   

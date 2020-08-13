@@ -36,6 +36,8 @@
 #' 1.4 Select type of report
 #' 1.4.1 summary = TRUE select the summary report from the *present_past_report*
 #' list
+#' 1.4.1.0 If the sublist summary from the list *present_past_report*  do not
+#' have any report, then send a string message
 #' 1.4.1.1.If the sublist summary from the list *present_past_report* have one report
 #' (present or past) then bring that report of the sublist Summary and convert 
 #' it to data.table including in the name of each variable of the report .present 
@@ -55,6 +57,8 @@
 #' variables we quit that suffix .present for each present variable.
 #' 1.4.2 summary = FALSE select the Not_Summary report from the *present_past_report*
 #' list
+#' 1.4.2.0 If the sublist Not_Summary from the list *present_past_report*  do not
+#' have any report, then send a string message
 #' 1.4.2.1 If the sublist Not_Summary from the list *present_past_report* have 
 #' one report (present or past) then bring that report of the sublist Not_Summary 
 #' and convert it to data.table including in the name of each variable of the
@@ -146,17 +150,20 @@ report_creator <- function(df,
                                   summary = summary))
       }) %>% set_names(c("Not_Summary", "Summary"))
       
-      present_past_report <- map(present_past_report, function(subreports){
+      present_past_report <- map(present_past_report, safely(function(subreports){
         if(any(map_int(subreports, ~.x[,.N]) == 0)){
           subreports <- subreports[map(subreports, ~.x[,.N]) > 0]
         }else subreports
         subreports
-      })
+      })) %>% map(~.x[["result"]]) 
       
       if(summary){
         present_past_report <- present_past_report["Summary"]
         
-        if(lengths(present_past_report) == 1){
+        if(lengths(present_past_report) == 0) 
+          final_report <- "You do not have any information in that period"
+        
+        else if(lengths(present_past_report) == 1){
           ## One period report
           final_report <- present_past_report %>% flatten_df() %>% as.data.table()
           
@@ -214,7 +221,10 @@ report_creator <- function(df,
       }else{
         present_past_report <- present_past_report["Not_Summary"]
         
-        if(lengths(present_past_report) == 1){
+        if(lengths(present_past_report) == 0) 
+          final_report <- "You do not have any information in that period"
+        
+        else if(lengths(present_past_report) == 1){
           final_report <- present_past_report %>% flatten_df() %>% as.data.table()
           
           final_report %>% setnames(old = names(final_report),
@@ -227,21 +237,23 @@ report_creator <- function(df,
           final_report %>% setnames(old = names(final_report),
                                     new = str_c(names(final_report),
                                                 "present",
-                                                sep = "."))
+                                                sep = "."))#
         }
       }
     }
   }else{
-    historical_reports <- map(c(FALSE, TRUE), 
-                              ~report_all_NumIntVar(df = df, date_filter = FALSE, #historical
-                                                    summary = .x)) %>% 
-      set_names(c("Not_Summary", "Summary"))
+    historical_reports <- map(c(FALSE, TRUE), safely(
+      ~report_all_NumIntVar(df = df, date_filter = FALSE, #historical
+                            summary = .x))) %>% 
+      map(~.x[["result"]]) %>% set_names(c("Not_Summary", "Summary"))
     
     if(summary){final_report <- historical_reports[["Summary"]]}
     else {final_report <- historical_reports[["Not_Summary"]]}
   }
   final_report
 }
+#report_creator(df = df, year = 2018, month = "JANUARY", summary = TRUE)
+#report_creator(df = df, year = 2018, month = "JANUARY", summary = FALSE)
 # report_creator(df = df, year = 2018, month = "NOVEMBER", summary = TRUE)
 # report_creator(df = df, year = 2018, month = "DECEMBER", summary = TRUE)
 # report_creator(df = df, year = 2018, month = "NOVEMBER", summary = FALSE)
@@ -285,7 +297,7 @@ difference_reference <- function(df, time_var){
 #' each sublist as the integer or numeric variable.
 #' Where this list *each_report* we need to iterate again over the summary 
 #' argument of the function *report_unique_NumIntVar*, where each sublist
-#' is going to be a report with the summay and the report without the summary
+#' is going to be a report with the summary and the report without the summary
 #' (only the grouped dataset)
 #' 2.1 date_filter = TRUE
 #' means that we want that our date variable is filtered with specific dates in
@@ -344,13 +356,13 @@ report_all_NumIntVar <- function(df, date_info = NULL, date_filter = FALSE,
     }) %>% set_names(c("Not_Summary", "Summary"))
     
   }else{
-    each_report <- map(c(FALSE, TRUE), function(summary){
+    each_report <- map(c(FALSE, TRUE), safely(function(summary){
       map(numerc_int_variable, 
           ~report_unique_NumIntVar(df = df,  
                                    num_int_var = .x,
                                    date_filter = FALSE,
-                                   summary = summary))
-    }) %>% set_names(c("Not_Summary", "Summary"))
+                                   summary = summary))})) %>% 
+      map(~.x[["result"]]) %>% set_names(c("Not_Summary", "Summary"))
   }
   
   if(summary){

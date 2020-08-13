@@ -17,25 +17,29 @@ body <- dashboardBody(
       tabName = "presentation",
       HomemenuInput_body("menu")
     ),
-    
     # Raw Data ----------------------------------------------------------------
     tabItem(
       tabName = "rawdata",
       raw_dataInput_body("raw_data")
     ),
-    
-    # General Reports ---------------------------------------------------------
-    tabItem(tabName = "GR",
-            pull_dataInput_body("pull_data") #change
+    # General Information -----------------------------------------------------
+    # # General Report --------------------------------------------------------
+    tabItem(
+      tabName = "GR",
+      reportInput_body("pull_report")
     ),
-    
+    # # Descriptive Statistics ------------------------------------------------
+    tabItem(
+      tabName = "DS",
+      "Modify 2"
+    ),
     # Statistical Distributions -----------------------------------------------
-    # Discrete Distributions 
+    # # Discrete Distributions ------------------------------------------------
     tabItem(
       tabName = "SDiscrete",
       discrete_distInput_body("discrete_distributions")
     ),
-    # Continous Distributions 
+    # # Continous Distributions -----------------------------------------------
     tabItem(tabName = "SDcontinous",
             "Modify2.1"
     ),
@@ -47,7 +51,6 @@ body <- dashboardBody(
     tabItem(tabName = "ULpca",
             "Modify3.1"
     ),
-    
     # Supervised Learning -----------------------------------------------------
     tabItem(tabName = "SLregression",
             "Modify4"
@@ -61,9 +64,8 @@ body <- dashboardBody(
     tabItem(tabName = "SLtrees",
             "Modify4.3"
     ),
-    
     # Forecast ----------------------------------------------------------------
-    tabItem(tabName = "forcast",
+    tabItem(tabName = "forecast",
             "Modify5"
     )
     

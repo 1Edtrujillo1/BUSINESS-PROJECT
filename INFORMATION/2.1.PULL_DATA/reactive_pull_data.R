@@ -1,8 +1,3 @@
-pull_dataInput_body <- function(id){
-  ns = NS(id)
-  DT::DTOutput(ns("pulltable"))
-}
-
 #' @description define the necessary parammeters to pull dataset from an SQL 
 #' server in the application
 #' @param id to connect each inputs and the output in the same session  

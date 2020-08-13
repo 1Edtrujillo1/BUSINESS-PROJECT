@@ -2,12 +2,19 @@
 
 # Design Dataset ----------------------------------------------------------
 
-#' @description we create two vectors first *percent_vars* containg the percentage
+#' @description 
+#' 1. from the *report_creator* function we saw that there are possibilities that 
+#' in a specific period there is no information, in that case this function will
+#' sen a string message that is the reason from the first if, in that case 
+#' this function *design_dataset* is going to be that string message:
+#' 2. In other case:
+#' 2.1. we create two vectors first *percent_vars* containg the percentage
 #' variables and those variables in the dataset we are going to apply the percent
-#' desigm with the help of the walk function. And the *not_percent_vars* 
+#' design with the help of the walk function. And the *not_percent_vars* 
 #' containing the not percentage variables (that are numeric or integer) and 
 #' those variables in the dataset we are going to apply the accounting design 
 #' with the help of the walk function.
+#' 2.2 We create our design report in format of datatable:
 #' Thanks to the previous steps our dataset is going to have a class of formattable
 #' With the help of the function *formattable* we apply to our dataset *df_desing*
 #' (with our previous designs) the design for the factors with the help of
@@ -16,45 +23,59 @@
 #' @note  Because the design in the previous two functions are in list, we need
 #' to use the function append to join the lists in one list.
 #' @param df to apply a design
-#' @return dataset with the design for each variable of a dataset.
+#' @return dataset with the design for each variable of a dataset in datatable.
 #' @note rembember that the dataset need to have variables only with data type
 #' factor, numeric and integer
+#' @note argumnets in datatable: 
+#' - color = color of observations, 
+#' - fontWeight = design of observations, 
+#' - text-align = align the observations in each column
 design_dataset <- function(df){
   
   df_desing <- copy(df)
   
-  # Format to number variables 
-  percent_vars <- percentage_variables(df = df)
-  not_percent_vars <- not_percentage_variables(df = df)
+  if(is.character(df_desing)) df_desing <- df_desing
   
-  walk(percent_vars,
-       ~df_desing[,(.x):=percent(get(.x), format = "f")])
-  walk(not_percent_vars, 
-       ~df_desing[,(.x):=accounting(get(.x), format = "f")])
-  
-  # Style of the dataset
-  formattable(df_desing, 
-              design_factor_vars(df = df_desing) %>% 
-                append(
-                  design_numeric_vars(df = df_desing,
-                                      varnumber_choice = "principal_not_percentage",
-                                      not_percent_vars = not_percent_vars)) %>% 
-                append(
-                  design_numeric_vars(df = df_desing, 
-                                      varnumber_choice = "principal_percentage",
-                                      percent_vars = percent_vars)) %>% 
-                append(
-                  design_numeric_vars(df = df_desing,
-                                      varnumber_choice = "result_not_percentage",
-                                      not_percent_vars = not_percent_vars)) %>% 
-                append(
-                  design_numeric_vars(df = df_desing,
-                                      varnumber_choice = "result_percentage",
-                                      percent_vars = percent_vars)
-                )) %>% 
-    return()
+  else{
+    # Format to number variables 
+    percent_vars <- percentage_variables(df = df_desing)
+    not_percent_vars <- not_percentage_variables(df = df_desing)
+    
+    walk(percent_vars,
+         ~df_desing[,(.x):=percent(get(.x), format = "f")])
+    walk(not_percent_vars, 
+         ~df_desing[,(.x):=accounting(get(.x), format = "f")])
+    
+    # Style of the dataset
+    df_desing <- as.datatable(
+      x = formattable(df_desing, 
+                      design_factor_vars(df = df_desing) %>% 
+                        append(
+                          design_numeric_vars(df = df_desing,
+                                              varnumber_choice = "principal_not_percentage",
+                                              not_percent_vars = not_percent_vars)) %>% 
+                        append(
+                          design_numeric_vars(df = df_desing, 
+                                              varnumber_choice = "principal_percentage",
+                                              percent_vars = percent_vars)) %>% 
+                        append(
+                          design_numeric_vars(df = df_desing,
+                                              varnumber_choice = "result_not_percentage",
+                                              not_percent_vars = not_percent_vars)) %>% 
+                        append(
+                          design_numeric_vars(df = df_desing,
+                                              varnumber_choice = "result_percentage",
+                                              percent_vars = percent_vars)
+                        )),
+      style = 'bootstrap',
+      filter = list(position = 'top', clear = FALSE),
+      options = list(
+        autoWidth = TRUE)) %>% 
+      formatStyle(c(percent_vars,not_percent_vars), color = 'black',
+                  fontWeight = 'bold', `text-align` = 'center')
+  }
+  df_desing
 }
-
 # design_dataset(df = df)
 
 #' @description define a vector *factor_variables* as the factor variables
@@ -184,29 +205,8 @@ not_percentage_variables <- function(df){
     percent_vars <- str_c(percent_vars, collapse = "|\\")
     
     not_percent_vars <- str_subset(string = numerc_int_variable, 
-                                     pattern = glue("^(?!(?:{percent_vars})).*$")) #everything except percent_vars variables
+                                   pattern = glue("^(?!(?:{percent_vars})).*$")) #everything except percent_vars variables
   }else not_percent_vars <- numerc_int_variable
   not_percent_vars
 }
 #not_percentage_variables(df = df)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

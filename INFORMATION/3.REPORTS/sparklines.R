@@ -11,25 +11,39 @@
 ############### 
 
 #' @description 
-#' 1. With our function created report_creator using the same information in 
-#' the dates variable we iterate over the summary argument to get the summary
+#' 1. With our function created *report_creator* using the same information in 
+#' the _dates_ variable we iterate over the summary argument to get the summary
 #' report saved in the Summary sublist and to get the grouped data saved in the
-#' Not_Summary of the final_reports list
-#' 2. In the defined summary report we change all the sufixes in its names
-#' 3. In the defined Not_Summary grouped dataset we apply the function 
+#' Not_Summary of the final_reports list.
+#' 2. Define the report
+#' 2.1 sparkline = TRUE
+#' 2.1.1. From the *report_creator* function we saw that there are possibilities 
+#' that in a specific period there is no information, in that case this function 
+#' will senD a string message  OR other cases that we get a null dataset 
+#' that is the reason from the first if, in that case this function 
+#' *final_design_df* is going to be that string message
+#' 2.1.2. In other case:
+#' In the defined Not_Summary grouped dataset we apply the function 
 #' *sparklines_all_NumIntVar* to creates a dataset with the sparklines of all
 #' the numeric and integer variables in that dataset for each possible levels 
-#' 4. Finally we merge both reports based on the factor variables with the 
-#' intention that the summary report cointain the sparklines for each numeric
-#' and integer variable.
-#' 5.To this final dataset we apply our function *design_dataset* to apply 
-#' the design to all the variables of the final dataset.
-#' 6. The next part of the code is to allow to watch the sparkline 
+#' And this final dataset is converted in datatable format.
+#' 
+#' 2.2 sparkline = FALSE
+#' 2.2.1 the same case as 2.1.1
+#' 2.2.2 In other case:
+#' we apply our function *design_dataset* to apply the design to all the 
+#' variables of the final dataset of the summary report
 #' @param df
-#' @return The final dataset with all the correct design 
+#' @param arguments of periodicity
+#' @param sparkline
+#' - if sparkline = TRUE: show the sparkline datatable
+#' - if sparkline  = FALSE: show the design report in datatable
+#' @return The final dataset with all the correct design depend on the sparkline
+#' argument
 final_design_df <- function(df,
                             year = NULL, month = NULL,
-                            semester = NULL, quarter = NULL){
+                            semester = NULL, quarter = NULL,
+                            sparkline = FALSE){
   
   df <- copy(df)
   
@@ -39,31 +53,50 @@ final_design_df <- function(df,
                                        quarter = quarter, summary = .x)) %>% 
     set_names(c("Summary", "Not_Summary"))
   
-  summary_report <- final_reports[["Summary"]] 
-  
-  summary_report %>% setnames(
-    old = str_subset(
-      string = names(summary_report),
-      pattern = classes_vector(data_type = "factor", df = summary_report)),
-    new = str_remove_all(
-      string = classes_vector(data_type = "factor", df = summary_report),
-      pattern = "(?:[.]present$|[.]past$)"))
-  
-  sparkline_report <- sparklines_all_NumIntVar(df = final_reports[["Not_Summary"]])
-  
-  factor_variables <- classes_vector(data_type = "factor", df = df)
-  
-  final_report <- merge(summary_report, sparkline_report, by = factor_variables, 
-                        all.x = TRUE)
-  
-  final_report <- design_dataset(df = copy(final_report))
-  final_report <- as.htmlwidget(final_report)
-  final_report$dependencies = c(final_report$dependencies, 
-                                htmlwidgets:::widget_dependencies("sparkline", 
-                                                                  "sparkline"))
+  if(sparkline){
+    not_summary_report <- final_reports[["Not_Summary"]]
+    
+    if(is.character(not_summary_report) | is.null(not_summary_report)) 
+      final_report <- "You do not have any information in that period"
+    
+    else{
+      sparkline_report <- sparklines_all_NumIntVar(df = not_summary_report)
+      
+      final_report <- datatable(copy(sparkline_report), 
+                                style = 'bootstrap',
+                                escape = FALSE, 
+                                filter = list(position = 'top', clear = FALSE), 
+                                options = list(
+                                  autoWidth = TRUE,
+                                  paging = FALSE, 
+                                  fnDrawCallback = htmlwidgets::JS(
+                                    'function(){HTMLWidgets.staticRender();}'), #JS code for the sparklines to allow datatable format
+                                  initComplete = JS("function(settings, json) {",
+                                                    "$(this.api().table().header()).css({'color': '#D3D3D3'});", #design of the names variables changing the color
+                                                    "}")
+                                )) %>% spk_add_deps() %>% 
+        formatStyle(names(sparkline_report), 
+                    backgroundColor = 'white') #style of datatable change the background color of the datatable
+    }
+    
+  }else{
+    summary_report <- final_reports[["Summary"]] 
+    
+    if(is.character(summary_report) | is.null(summary_report)) 
+      final_report <- "You do not have any information in that period"
+    
+    else{
+      # summary_report %>% setnames(
+      #   old = names(summary_report),
+      #   new = str_remove_all(string = names(summary_report),
+      #                        pattern = "(?:[.]present$|[.]past$)"))
+      
+      final_report <- design_dataset(df = copy(summary_report))
+    }
+  }
   final_report
 }
-#final_design_df(df = df, year = 2020, semester = 1)
+#final_design_df(df = df, year = 2020, semester = 1, sparkline = TRUE)
 
 #' @description 
 #' 1. For each name variable in the dataset we delete the suffixes .present or
@@ -96,9 +129,11 @@ sparklines_all_NumIntVar <- function(df){
   numerc_int_variable <- classes_vector(data_type = c("integer", "numeric"), 
                                         df = df)
   each_sparkline <- map(numerc_int_variable, 
-                        ~sparklines_unique_NumIntVar(df = df, num_int_var = .x,
-                                                     factor_variables = factor_variables)) %>% 
-    set_names(numerc_int_variable)
+                        safely(~sparklines_unique_NumIntVar(df = df, 
+                                                            num_int_var = .x,
+                                                            factor_variables = 
+                                                              factor_variables))) %>% 
+    map(~.x[["result"]]) %>% set_names(numerc_int_variable)
   df_sparklines <- iterative_merge(dfs_list = each_sparkline, 
                                    key = factor_variables)
   df_sparklines
@@ -131,9 +166,9 @@ sparklines_unique_NumIntVar <- function(df, num_int_var, factor_variables){
   
   map(distributions, 
       ~.x[,factor_variables, with = FALSE] %>% unique() %>% 
-        .[,str_c(num_int_var, "spark", sep = "."):=
-            as.character(htmltools::as.tags(
-              sparkline(.x[,get(num_int_var)], type = "line")))
+        .[,(num_int_var):= as.character(htmltools::as.tags(sparkline
+                                                           (.x[,get(num_int_var)], 
+                                                             type = "line")))
         ]) %>% 
     rbindlist() %>% return()
 }
@@ -186,6 +221,3 @@ marginal_distribution <- function(df, num_int_var, factor_variables){
 # factor_variables <- classes_vector(data_type = "factor", df = df2)
 # marginal_distribution(df = df2, num_int_var = "PASSENGERID.present",
 #                       factor_variables = factor_variables)
-
-
-
