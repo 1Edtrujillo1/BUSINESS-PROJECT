@@ -26,3 +26,18 @@
 
 # rightSidebarTabContent(
 #   id = 1,..)
+
+# . -----------------------------------------------------------------------
+
+#library(pryr) to save base plot objects
+
+# . -----------------------------------------------------------------------
+
+# library(chartjs) donout chart for comparing numeric variable based on levels
+# http://tutuchan.github.io/chartjs/index.html
+
+# . -----------------------------------------------------------------------
+
+#STANDARD ERROR
+#https://www.datanovia.com/en/lessons/ggplot-error-bars/
+#http://www.cookbook-r.com/Graphs/Plotting_means_and_error_bars_(ggplot2)/

@@ -1,0 +1,18 @@
+{
+    "COEFICIENT OF VARIATION":{
+        "MEAN 0":"The sample mean need to be different from 0.",
+        "COEF_VAR<1": "Indicates that you have a low variance around the sample mean.",
+        "COEF_VAR>1": "Indicates that you have a high variance around the sample mean."
+    },
+    "STANDARD ERROR": "Is the dispersion from the mean of each bin around the sample mean.",
+    "SKEWENESS":{
+        "SK < 0": "Then the tail of the sample distribution goes to the left from the mean.",
+        "SK = 0": "Then sample distribution around the mean is simetric.",
+        "SK > 0": "Then the tail of the sample distribution goes to the right from the mean."
+    },
+    "KURTOSIS":{
+        "K < 0": "PLATICURTIC, this is, the sample distribution has a slow decay and wide tails.",
+        "K = 0": "MESOCURTIC, this is, the sample distribution has normal curve.",
+        "K > 0": "LEPTOCURTIC, this is, the sample distribution has a fast decay and light tails."
+    }
+}

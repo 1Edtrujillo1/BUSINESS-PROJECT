@@ -7,10 +7,11 @@ map(c("shiny", "shinydashboard", "dashboardthemes", "shinydashboardPlus",
       "shinyWidgets", "mixdist","DT", "jsonlite", "data.table", "dplyr", 
       "bit64", "stringr", "scales", "ggplot2", "plotly", "haven", "readxl", 
       "lubridate", "tidyr", "DBI", "odbc", "glue", "arrangements", "formattable",
-      "sparkline"), 
+      "sparkline", "moments", "chartjs"), 
     require, character.only = TRUE)
 
 source("INFORMATION/1.MENU/reactive_menu.R")
+source("INFORMATION/utils.R")
 
 map(
   str_c("INFORMATION/2.RAW_DATA", 
@@ -28,6 +29,12 @@ map(
   str_c("INFORMATION/3.REPORTS",
         c("reports.R", "design_reports.R", "sparklines.R",
           "reactive_reports.R"), sep = "/"),
+  source
+)
+
+map(
+  str_c("INFORMATION/3.1.DESCRIPTIVE_STATISTICS",
+        c("descriptive_statistics.R"), sep = "/"),
   source
 )
 
