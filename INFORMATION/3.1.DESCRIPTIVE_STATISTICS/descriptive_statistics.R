@@ -11,11 +11,20 @@
 # level_string <- names(distribution)[[3]]
 
 #' @description 
-#' @param
-#' @return
+#' if we don´t have any factor variable we cant´t make the analysis and
+#' we need only one numeric or integer variable because we are making a univariable
+#' analysis, based on the level of the dataset we make the analysis
+#' @param df dataset to make the analysis
+#' @param level string 
+#' level = "all"
+#' level = level_string = name of the sublist from function help_distribution 
+#' with the argument distribution = TRUE
+#' @param table type of analysis
+#' @param plot type of plot
+#' @param description for the coefficients
+#' @return a data.table or plot base on table and plot arguments
 general_Descript_Stats <- function(df, 
-                                   level = c("all", 
-                                             level_string),
+                                   level_string,
                                    table = c("frequency",
                                              "central",
                                              "dispersion",
@@ -39,213 +48,241 @@ general_Descript_Stats <- function(df,
                                      df = df)
   num_int_var <- classes_vector(data_type = c("integer", "numeric"),
                                 df = df)
-  if(length(num_int_var) != 1) 
-    result <- 
-    "You need ONE numeric or integer variable to make an UNIVARIABLE ANALYSIS"
+  if(length(factor_variables) == 0) result <- "You need at least one factor variable"
   else{
-    distribution <- help_distribution(df = df, 
-                                      num_int_var = num_int_var,
-                                      factor_variables = factor_variables,
-                                      func = NULL,
-                                      distribution = TRUE)
-    if(level == "all") df <- df
-    else if(level == level_string) df <- distribution[[level_string]]
-    
-    frequency <- map(c("table", "acumulative_1", 
-                       "acumulative_2", "histogram"),
-                     ~descript_frequency(df = df, 
-                                         num_int_var = num_int_var,
-                                         plot = .x)) %>% 
-      set_names(c("table", "acumulative_1", 
-                  "acumulative_2", "histogram"))
-    
-    calculations <- map(list(~central_tendency(df = .x, 
-                                               num_int_var = num_int_var,
-                                               plot = "table"),
-                             ~dispersion_measures(df = .x,
-                                                  num_int_var = num_int_var)),
-                        ~help_distribution(df = df, 
-                                           num_int_var = num_int_var,
-                                           factor_variables = factor_variables,
-                                           func = .x,
-                                           distribution = FALSE)) %>% 
-      set_names("CENTRAL", "DISPERSION")
-    
-    coefficients <- map(c(TRUE, FALSE), function(description){
-      map(c("coef_var", "standard_error","skeweness", "kurtosis"), 
-          ~statistical_coefficients(df = df, 
-                                    num_int_var = num_int_var, 
-                                    unit = .x,
-                                    description = description)) %>% 
-        set_names(c("coef_var", "standard_error","skeweness", "kurtosis"))
-    }) %>% set_names("Description", "Not Description")
-    
-    if(table == "frequency"){
-      if(level == "all") 
-        result <- "Is better to make the analysis of Frequencies in a specific combination of levels"
-      else if(level == level_string){
-        if(plot == "table") result <- frequency[["table"]]
-        else if(plot == "acumulative_1") result <- frequency[["acumulative_1"]]
-        else if(plot == "acumulative_2") result <- frequency[["acumulative_2"]]
-        else if(plot == "histogram") result <- frequency[["histogram"]]
-        else result <- NULL
-      }else result <- NULL
+    if(length(num_int_var) != 1) 
+      result <- 
+        "You need ONE numeric or integer variable to make an UNIVARIABLE ANALYSIS"
+    else{
+      distribution <- help_distribution(df = df, 
+                                        num_int_var = num_int_var,
+                                        factor_variables = factor_variables,
+                                        func = NULL,
+                                        distribution = TRUE)
       
-    }else if(table == "central"){
-      df_central_tendency <- calculations[["CENTRAL"]]
-      if(level == "all"){
-        names_factors_df_central_tendency <- 
-          df_central_tendency[,factor_variables, with = FALSE] %>% 
-          split(x = ., f = seq(.[,.N])) %>% 
-          map_chr(~str_c(.x %>% unlist(), collapse = ",")) %>% unname()
-        if(plot == "table") result <- df_central_tendency
-        else if(plot == "comparing_means"){
-          if(df_central_tendency[,.N] <= 6){ #to show correctly with chartjs
-            result <- chartjs(height = "500px", palette = "Paired") %>% 
-              cjsOptions(animation = list(animateScale = TRUE, 
-                                          animateRotate = TRUE)) %>% 
-              cjsPolar(labels = names_factors_df_central_tendency) %>% 
-              cjsSeries(data = round(x = df_central_tendency[,MEAN], digits = 2)) 
-          }else result <- "You need to have 6 or less possible combination of levels" 
-        }else if(plot == "standard_error"){
-          plot_se <- copy(df_central_tendency)[, X:=1:.N]
-          SE <- coefficients[["Not Description"]][["standard_error"]]
-          plot_se <- plot_se %>% ggplot(aes(x = X, y = MEAN, fill = as.factor(X))) + 
-            geom_col(alpha = 0.6, color = "black") +
-            geom_errorbar(aes(ymin = MEAN-SE, ymax = MEAN+SE)) + 
-            labs(title = paste("Comparing means from each level based on", 
-                               num_int_var),
-                 x = "LEVELS") + 
-            scale_x_discrete(limits = names_factors_df_central_tendency) + 
-            theme(legend.position = "none")
-          result <- design_plot(plot = plot_se)
-        }else result <- NULL
-      }else if(level == level_string){
-        plots_central_levels <- map(c("general_boxplot","bins_boxplot"),
-                                    ~central_tendency(df = df, 
-                                                      num_int_var = num_int_var, 
-                                                      plot = .x)) %>% 
-          set_names("general_boxplot","bins_boxplot")
-        if(plot == "table") result <- df_central_tendency
-        else if(plot == "level_general_boxplot")
-          result <- plots_central_levels[["general_boxplot"]]
-        else if(plot == "level_bins_boxplot") 
-          result <- plots_central_levels[["bins_boxplot"]]
-        else result <- NULL
-      } else result <- NULL
+      if(level_string == "all"){df <- df}
+      else{df <- distribution[[level_string]]} #names(distribution) = level_string
       
-    }else if(table == "dispersion"){
-      df_dispersion <- calculations[["DISPERSION"]]
-      result <- df_dispersion
+      frequency <- map(c("table", "acumulative_1", 
+                         "acumulative_2", "histogram"),
+                       safely(~descript_frequency(df = df, 
+                                                  num_int_var = num_int_var,
+                                                  plot = .x))) %>% 
+        map(~.x[["result"]]) %>% 
+        set_names(c("table", "acumulative_1", 
+                    "acumulative_2", "histogram"))
       
-    }else if(table == "coef_var"){
-      if(description) result <- coefficients[["Description"]][["coef_var"]]
-      else result <- coefficients[["Not Description"]][["coef_var"]]
+      calculations <- map(list(~central_tendency(df = .x, 
+                                                 num_int_var = num_int_var,
+                                                 plot = "table"),
+                               ~dispersion_measures(df = .x,
+                                                    num_int_var = num_int_var)),
+                          safely(~help_distribution(df = df, 
+                                                    num_int_var = num_int_var,
+                                                    factor_variables = factor_variables,
+                                                    func = .x,
+                                                    distribution = FALSE))) %>% 
+        map(~.x[["result"]]) %>% set_names("CENTRAL", "DISPERSION")
+      walk(calculations, function(i){
+        if(is.null(i)) i
+        else{
+          num_int <- classes_vector(data_type = c("integer", "numeric"), df = i)
+          walk(num_int, ~i[,(.x):=round(get(.x), digits = 2)])
+        }
+      })
       
-    }else if(table == "standard_error"){
-      if(description) result <- coefficients[["Description"]][["standard_error"]]
-      else result <- coefficients[["Not Description"]][["standard_error"]]
+      coefficients <- map(c(TRUE, FALSE), safely(function(description){
+        map(c("coef_var", "standard_error","skeweness", "kurtosis"), 
+            safely(~statistical_coefficients(df = df, 
+                                             num_int_var = num_int_var, 
+                                             unit = .x,
+                                             description = description))) %>% 
+          map(~.x[["result"]]) %>% 
+          set_names(c("coef_var", "standard_error","skeweness", "kurtosis"))
+      })) %>% map(~.x[["result"]]) %>% 
+        set_names("Description", "Not Description")
       
-    }else if(table == "skeweness"){
-      if(description) result <- coefficients[["Description"]][["skeweness"]]
-      else result <- coefficients[["Not Description"]][["skeweness"]]
-      
-    }else if(table == "kurtosis"){
-      if(description) result <- coefficients[["Description"]][["kurtosis"]]
-      else result <- coefficients[["Not Description"]][["kurtosis"]]
-      
-    }else if(table %in% c("conditional frequency", "conditional expectation")){
-      if(level == "all"){
-        conditional_choice <- map(c("conditional frequency", 
-                                    "conditional expectation"), 
-                                  ~conditional_stats(df = df, 
-                                                     num_int_var = num_int_var, 
-                                                     distribution = distribution,
-                                                     table = .x)) %>% 
-          set_names("conditional frequency", "conditional expectation")
-        if(table == "conditional frequency") 
-          result <- conditional_choice[["conditional frequency"]]
-        else if(table == "conditional expectation")
-          result <- conditional_choice[["conditional expectation"]]
-      } else 
-        result <- glue("Conditional values of {num_int_var} based on all levels of dataset") 
-      
-    }else result <- NULL
+      if(table == "frequency"){
+        if(level_string == "all") 
+          result <- "Is better to make the analysis of Frequencies in a specific combination of levels"
+        else{ #names(distribution) = level_string
+          if(plot == "table") result <- frequency[["table"]]
+          else if(plot == "acumulative_1") result <- frequency[["acumulative_1"]]
+          else if(plot == "acumulative_2") result <- frequency[["acumulative_2"]]
+          else if(plot == "histogram") result <- frequency[["histogram"]]
+          else result <- NULL
+        }
+        
+      }else if(table == "central"){
+        df_central_tendency <- calculations[["CENTRAL"]]
+        
+        if(level_string == "all"){
+          names_factors_df_central_tendency <- 
+            df_central_tendency[,factor_variables, with = FALSE] %>% 
+            split(x = ., f = seq(.[,.N])) %>% 
+            map_chr(~str_c(.x %>% unlist(), collapse = ",")) %>% unname()
+          
+          if(plot == "table") result <- df_central_tendency
+          
+          else if(plot == "comparing_means"){
+            if(df_central_tendency[,.N] <= 6){ #to show correctly with chartjs
+              result <- chartjs(height = "399", width = "915", palette = "Paired") %>% 
+                cjsOptions(animation = list(animateScale = TRUE, 
+                                            animateRotate = TRUE)) %>% 
+                cjsPolar(labels = names_factors_df_central_tendency) %>% 
+                cjsSeries(data = df_central_tendency[,MEAN]) 
+              
+            }else result <- "You need to have 6 or less possible combination of levels" 
+            
+          }else if(plot == "standard_error"){
+            plot_se <- copy(df_central_tendency)[, X:=1:.N]
+            SE <- coefficients[["Not Description"]][["standard_error"]]
+            plot_se <- plot_se %>% ggplot(aes(x = X, y = MEAN, fill = as.factor(X))) + 
+              geom_col(alpha = 0.6, color = "black") +
+              geom_errorbar(aes(ymin = MEAN-SE, ymax = MEAN+SE)) + 
+              labs(title = paste("Comparing means from each level based on", 
+                                 num_int_var),
+                   x = "LEVELS",
+                   fill = "BINS") + 
+              scale_x_discrete(limits = names_factors_df_central_tendency) + 
+              theme(legend.position = "none")
+            result <- design_plot(plot = plot_se)
+            
+          }else result <- NULL
+        }else{ #names(distribution)= level_string
+          plots_central_levels <- map(c("general_boxplot","bins_boxplot"),
+                                      ~central_tendency(df = df, 
+                                                        num_int_var = num_int_var, 
+                                                        plot = .x)) %>% 
+            set_names("general_boxplot","bins_boxplot")
+          if(plot == "table") result <- df_central_tendency
+          else if(plot == "level_general_boxplot")
+            result <- plots_central_levels[["general_boxplot"]]
+          else if(plot == "level_bins_boxplot") 
+            result <- plots_central_levels[["bins_boxplot"]]
+          else result <- NULL
+        }
+        
+      }else if(table == "dispersion"){
+        df_dispersion <- calculations[["DISPERSION"]]
+        result <- df_dispersion
+        
+      }else if(table == "coef_var"){
+        if(description) result <- coefficients[["Description"]][["coef_var"]]
+        else result <- coefficients[["Not Description"]][["coef_var"]]
+        
+      }else if(table == "standard_error"){
+        if(description) result <- coefficients[["Description"]][["standard_error"]]
+        else result <- coefficients[["Not Description"]][["standard_error"]]
+        
+      }else if(table == "skeweness"){
+        if(description) result <- coefficients[["Description"]][["skeweness"]]
+        else result <- coefficients[["Not Description"]][["skeweness"]]
+        
+      }else if(table == "kurtosis"){
+        if(description) result <- coefficients[["Description"]][["kurtosis"]]
+        else result <- coefficients[["Not Description"]][["kurtosis"]]
+        
+      }else if(table %in% c("conditional frequency", "conditional expectation")){
+        if(level_string == "all"){
+          conditional_choice <- map(c("conditional frequency", 
+                                      "conditional expectation"), 
+                                    ~conditional_stats(df = df, 
+                                                       num_int_var = num_int_var, 
+                                                       distribution = distribution,
+                                                       table = .x)) %>% 
+            set_names("conditional frequency", "conditional expectation")
+          if(table == "conditional frequency") 
+            result <- conditional_choice[["conditional frequency"]]
+          else if(table == "conditional expectation")
+            result <- conditional_choice[["conditional expectation"]]
+        } else #names(distribution) = level_string
+          result <- glue("Conditional values of {num_int_var} based on all levels of dataset") 
+      }
+    }
   }
   result
 }
 # general_Descript_Stats(df = df,
-#                        level = level_string,
+#                        level_string = "MALE,3",
 #                        table = "frequency")
 # general_Descript_Stats(df = df,
-#                        level = level_string,
+#                        level_string = "MALE,3",
 #                        table = "frequency",
 #                        plot = "acumulative_1")
 # general_Descript_Stats(df = df,
-#                        level = level_string,
+#                        level_string = "MALE,3",
 #                        table = "frequency",
 #                        plot = "histogram")
 # 
 # general_Descript_Stats(df = df,
-#                        level = "all",
+#                        level_string = "all",
 #                        table = "central")
 # general_Descript_Stats(df = df,
-#                        level = "all",
+#                        level_string = "all",
 #                        table = "central",
 #                        plot = "comparing_means")
 # general_Descript_Stats(df = df,
-#                        level = "all",
+#                        level_string = "all",
 #                        table = "central",
 #                        plot = "standard_error")
 # 
 # general_Descript_Stats(df = df,
-#                        level = level_string,
+#                        level_string = "MALE,3",
 #                        table = "central",
 #                        plot = "table")
 # general_Descript_Stats(df = df,
-#                        level = level_string,
+#                        level_string = "MALE,3",
 #                        table = "central",
 #                        plot = "level_general_boxplot")
 # general_Descript_Stats(df = df,
-#                        level = level_string,
+#                        level_string = "MALE,3",
 #                        table = "central",
 #                        plot = "level_bins_boxplot")
 # 
 # general_Descript_Stats(df = df,
-#                        level = "all",
+#                        level_string = "all",
 #                        table = "dispersion")
 # general_Descript_Stats(df = df,
-#                        level = level_string,
+#                        level_string = "MALE,3",
 #                        table = "dispersion")
 # 
 # general_Descript_Stats(df = df,
-#                        level = level_string,
+#                        level_string = "MALE,3",
 #                        table = "coef_var",
 #                        description = TRUE)
 # general_Descript_Stats(df = df,
-#                        level = level_string,
+#                        level_string = "MALE,3",
 #                        table = "standard_error",
 #                        description = TRUE)
 # general_Descript_Stats(df = df,
-#                        level = level_string,
+#                        level_string = "MALE,3",
 #                        table = "skeweness",
 #                        description = TRUE)
 # general_Descript_Stats(df = df,
-#                        level = level_string,
+#                        level_string = "MALE,3",
 #                        table = "kurtosis",
 #                        description = TRUE)
 # 
 # general_Descript_Stats(df = df,
-#                        level = "all",
+#                        level_string = "all",
 #                        table = "conditional frequency")
 # general_Descript_Stats(df = df,
-#                        level = "all",
+#                        level_string = "all",
 #                        table = "conditional expectation")
 
 #' @SUBFUNCTION
-#' @description 
-#' @param
+#' @description we use the definition of our function marginal_distribution 
+#' and base on the distribution argument we select what to bring
+#' @param df dataset
+#' @param num_int_var analysis applied to ONE numeric or integer variable
+#' @param factor_variables analysis applied to all levels of a factor variable(s)
+#' @param func if distribution = FALSE to apply specific function to sublists of
+#' distribution
+#' @param distribution parameter to select the type of analysis
 #' @return
+#' if distribution = TRUE bring a list with the definition of marginal_distribution
+#' if distribution = FALSE we use func to apply a function to each sublist
 help_distribution <- function(df, num_int_var, factor_variables, 
                               func = NULL,
                               distribution = FALSE){
@@ -256,7 +293,7 @@ help_distribution <- function(df, num_int_var, factor_variables,
   if(distribution) result <- distributions
   else{
     dfs_fators <- map(distributions, 
-                      ~.x[,factor_variables, with = FALSE] %>% unique())
+                      ~.x[,factor_variables, with = FALSE] %>% unique()) #unique() bring unique elements in each sublist
     
     each <- map(distributions, func)
     
@@ -276,8 +313,48 @@ help_distribution <- function(df, num_int_var, factor_variables,
 
 # Frequency Distribution --------------------------------------------------
 #' @description 
-#' @param
+#' 1. boundaries: define the list from the boundaries function
+#' 2. bounds: split the dataset bounds from the previous list, in a list of 
+#' sublists where each is each row from the dataset 
+#' 3. freq: based on bounds, we count the number of elements from the dataset
+#' in each sublist of bounds
+#' 4. Is necessary that the sum of frequencies is equal to the total elements of 
+#' the dataset in other case send a string message
+#' 5. frequency_df is the frequency table
+#' 5.1 if plot = "table" we bring frequency_df
+#' 5.2 if plot = "acumulative_1 we bring a ogive plot based on frequency_df
+#' 5.3 if plot = "acumulative_2" we bring the acumulative distribution based on
+#' frequency_df
+#' 5.4 if plot = "histogram" we bring the histogram based on frequency_df where:
+#' 5.4.1 Create the dataset histogram where we add a variable Xi that is the 
+#' middle point in each bin
+#' 5.4.2. with the help of the function descriptive_mode we bring the mode of the 
+#' numeric variable from the original df
+#' 5.4.3 visualize the mode in the plot:
+#' we create mode_hist, where from bounds (previously), the sublists are now
+#' a logical vector where we check if the mode(s) is between each sublist, and
+#' with the function any we only bring TRUE or FALSE in each sublist, then we 
+#' filter only the TRUE ones in each sublist and bring the names of the sublists.
+#' After that in the bounds (previously) we bring only the intervals which have
+#' mode based on the mode_hist list created (this is the new mode_hist)
+#' from the histogram dataset we filter only the LI and LS that are in mode_hist
+#' and bring Xi (which represent that arround that particular Xi is a mode (s))
+#' 5.4.3.1 the previous Xi are visualized in the first geom_col and we color those
+#' bins in pink, up to here we have the correct histogram
+#' 5.4.4 we add vertical lines to represent the mean, q25, median, q75
+#' 5.4.5 we add a horizontal line representing the IQR, adding points to visualize.
+#' 5.4.6. we add a segment to represent the standard deviation from the mean, 
+#' at the top of the plot. adding points to visualize.
+#' 5.4.7 Usingf the design_plot to the final design of the plot.
+#' @param df dataset to make the analysis
+#' @param num_int_var analysis applied to ONE numeric or integer variable
+#' @param plot based on this parameter we select the type of analysis
 #' @return
+#' if plot = "table" we create a frequency table
+#' if plot = "acumulative_1 we create a ogive plot based on the acumulative in
+#' percent unit
+#' if plot = "acumulative_2" we create a acumulative distribution function
+#' if plot = "histogram" we create a histogram plot
 descript_frequency <- function(df, num_int_var, 
                                plot = c("table", "acumulative_1", 
                                         "acumulative_2", "histogram")){
@@ -313,12 +390,13 @@ descript_frequency <- function(df, num_int_var,
       ogive_plot <- ggplot(frequency_df, aes(x = LS, y = CUM_PERCENT)) + 
         geom_line(color = "red") + 
         geom_point(color = "blue", shape = 15, size = 2) + 
-        labs(title = "OGIVE",
+        labs(title = paste("OGIVE of ", num_int_var),
              x = num_int_var,
              y = "ACUMULATIVE") 
       result <- design_plot(plot = ogive_plot)
       
     }else if(plot == "acumulative_2"){
+      par(bg = "#2D3741")
       plot(ecdf(x = frequency_df$LS), 
            main = "",
            xlab = "",
@@ -365,7 +443,7 @@ descript_frequency <- function(df, num_int_var,
                                          num_int_var = num_int_var, 
                                          plot = "table")
       histogram <- histogram + 
-        map(mode, ~geom_point(aes(x = .x, y = 0), color = "#d24cff")) + 
+        map(mode, ~geom_point(aes(x = .x, y = 0), color = "#d24cff")) + #iterate arguments in a geom_
         geom_vline(aes(xintercept = cent_tend_vals[,MEAN]), 
                    col = "red", linetype = 1) +
         geom_vline(aes(xintercept = cent_tend_vals[,Q25]), 
@@ -414,8 +492,20 @@ descript_frequency <- function(df, num_int_var,
 #                              plot = "histogram")
 
 #' @description 
-#' @param
-#' @return
+#' 1. eliminate the NA´s in the dataset to create the bins
+#' 2. calculate the max and min iterating with invoke_map from the dataset
+#' 3. calculate the number of bins
+#' 4. calculate the size of each bin
+#' 5. create vector of all the values from the interval of each bin
+#' 6. Create a list with all the previous, where bounds in the list is a data.table
+#' with the interval of each bin
+#' @param df dataset 
+#' @param num_int_var analysis applied to ONE numeric or integer variable
+#' @return list:
+#' bins_number: number of bins in the dataset
+#' bin_size: the size of each bin
+#' interval_values: vector of all the values from the interval of each bin
+#' bonds: limit inferior and limit superior of each interval in each bin.
 boundaries <- function(df, num_int_var){
   
   df <- copy(df) %>% drop_na()
@@ -452,8 +542,26 @@ boundaries <- function(df, num_int_var){
 
 # Central Tendency --------------------------------------------------------
 #' @description 
-#' @param
+#' 1. probs_percentile list of the interested percentiles
+#' 2. elements_sublists list which there are two sublists (central and percentil)
+#' and each sublist is a list of lists where each sublist represent the numeric
+#' variable of the df where central have 4 to apply with max, min, mean, median and 
+#' percentil has 5 for the probs_percentile to apply with quantile function
+#' 3.central_tendency_values_and_percentiles using invoke_map we iterate for each
+#' function where the first list is the functions and the second list is the 
+#' arguments, where we use map2 to get in each sublist the numeric variable and
+#' the respective percentile
+#' 4. we convert this list in data.table adding the mode and the midrange and 
+#' finally order the columns in a way that we want.
+#' 5. we bring our result based on the plot argument.
+#' @param df dataset
+#' @param num_int_var analysis applied to ONE numeric or integer variable
+#' @param plot based on this parameter we select the type of analysis
 #' @return
+#' if plot = table we return a dataset with the mode, mean min, q25, median, q75,
+#' p90,p95,p99,max, midrange
+#' if plot = general_boxplot we return the boxplot of the numeric  variable
+#' if plot = bins_boxplot we return the boxplot in each bin
 central_tendency <- function(df, num_int_var, plot = c("table", "general_boxplot", 
                                                        "bins_boxplot")){
   
@@ -532,9 +640,13 @@ central_tendency <- function(df, num_int_var, plot = c("table", "general_boxplot
 # central_tendency(df = df2, num_int_var = num_int_var, plot = "general_boxplot")
 # central_tendency(df = df2, num_int_var = num_int_var, plot = "bins_boxplot")
 
-#' @description 
-#' @param
-#' @return
+#' @description we count the number of elements of the numeric variable and 
+#' select the value with max frequency. 
+#' @param df dataset
+#' @param num_int_var analysis applied to ONE numeric or integer variable
+#' @return 
+#' if description = FALSE we return the mode of a numeric or integer variable from a df
+#' if description = TRUE we return the interpretation of the mode
 descriptive_mode <- function(df, num_int_var,description = FALSE){
   
   mode <- df[,.N, by = num_int_var] %>% 
@@ -561,12 +673,13 @@ descriptive_mode <- function(df, num_int_var,description = FALSE){
 
 # Measures of Dispersion --------------------------------------------------
 #' @description 
-#' @param
-#' @return
-#' variance
-#' standard deviation
-#' range
-#' interquantil range
+#' 1. with the help of invoke_map we iterate over the functions var and sd 
+#' with the arguments the numeric or integer variable for each function.
+#' 2. convert the list to data.table and calculate the IQR and the range.
+#' @param df dataset
+#' @param num_int_var analysis applied to ONE numeric or integer variable
+#' @return dataset with the variance, standard deviation, interquantil range 
+#' and range of the numeric or integer variable
 dispersion_measures <- function(df, num_int_var){
   
   dispersion_values <- invoke_map(list(var, sd),
@@ -588,24 +701,29 @@ dispersion_measures <- function(df, num_int_var){
 #dispersion_measures(df = df2, num_int_var = num_int_var)
 
 # Coefficient of Variations -----------------------------------------------
-#' @description 
-#' @param
+#' @description calculate each coefficient and depend on the description argument 
+#' we bring the value or the interpretation of the value. 
+#' @param df dataset
+#' @param num_int_var analysis applied to ONE numeric or integer variable
+#' @param unit  based on this parameter we select the type of analysis
+#' @param description 
+#' description = TRUE we show the interpretation of the coefficient
+#' description = FALSE we show only the value of the coefficient
 #' @return
-#' coeffiicient of variation
-#' ratio of the standard deviation to the sample mean
+#' if unit = "coef_var" (coeffiicient of variation : ratio of the standard 
+#' deviation to the sample mean)
 #' rules:
 #' mean dif from 0
 #' - coef<1 low variance
 #' - coef>1 low variance
 
-#' standard error #error bar
-#' measure of the dispersion of sample means around the population mean. 
-#' (mean in each bin (each bin is X1,X2,..,Xn iid) respect the total mean) 
-#' this is how much sample means will vary from the standard deviation
-#' it is generaly used in confidence intervals
+#' if unit = "standard_error" error bar (measure of the dispersion of sample means 
+#' around the population mean. (mean in each bin (each bin is X1,X2,..,Xn iid) 
+#' respect the total mean) this is how much sample means will vary from the 
+#' standard deviation it is generaly used in confidence intervals)
 
-#' coefficient of asimetry skewness: analyze if the distribution of the data is
-#' simetric around the mean 
+#' if unit = "skeweness" (coefficient of asimetry skewness: analyze if the 
+#' distribution of the data is simetric around the mean)
 #' rules:
 #' -sk>0 in the frequency plot, the data presents a tale goes to the right from the mean 
 #' (Data is in the right hand away from the mean)positive skewness
@@ -614,10 +732,10 @@ dispersion_measures <- function(df, num_int_var){
 #' -sk<0 in the frequency plot, the data presents a tale goes to the left from the mean 
 #' (Data is in the left hand away from the mean)negative skewness
 
-#' kurtosis: degree of relative flattening of the data distribution
+#' if unit = "kurtosis" (degree of relative flattening of the data distribution
 #' this unit of medicion of the form of the tails of the distribution of the data, 
 #' where this unit wide or reduce the tailes of distribution of the sample with the
-#' intention to check peak of the plot 
+#' intention to check peak of the plot)
 #' rules: 
 #' k3>0 LEPTOCURTICA: fast decay, light tails
 #' k3=0 MESOCURTICA: normal curve
@@ -646,8 +764,8 @@ statistical_coefficients <- function(df, num_int_var,
     if(description){
       if(COEF_VAR < 1) 
         glue("{COEF_VAR}<1 {descriptions[['COEFICIENT OF VARIATION']]$`COEF_VAR<1`}")
-      else if(COEF_VAR > 1) 
-        glue("{COEF_VAR}>1 {descriptions[['COEFICIENT OF VARIATION']]$`COEF_VAR>1`}")
+      else if(COEF_VAR >= 1) 
+        glue("{COEF_VAR}>=1 {descriptions[['COEFICIENT OF VARIATION']]$`COEF_VAR>1`}")
     }else COEF_VAR
     
   }else if(unit == "standard_error"){
@@ -682,8 +800,57 @@ statistical_coefficients <- function(df, num_int_var,
 
 # Conditional Expectancy --------------------------------------------------
 #' @description 
-#' @param
+#' 1. x_var we get the numeric variable for each sublist of distrubtion
+#' 2. x_var_prop  we get the proportion of x_var (for each sublist of distribution)
+#' 3. x_var_df is a dataset with x_var and x_var_prop (for each sublist of 
+#' distribution)
+#' 4.possibilities_intesect is the possible combinations of intersections between
+#' the sublists of x_var
+#' 5. names_possibilities are the names that are going to be in each sublist
+#' of the list possibilities_intesect and with the help of the for we assign the
+#' names to each sublist
+#' 6. Then with compact we quit the NULL´s and filter every sublist that has 
+#' intersect numbers, and bring only from possibilities_intesect the ones that
+#' are intersected with the name of each sublist
+#' 7. If the list do not have any intersections then we bring a data.table 
+#' with a string message.
+#' In other case:
+#' 8. split_names_possibilites: From the list possibilities_intesect in each 
+#' sublist we separate the names (with the intention to create which is given by
+#' which), so fo each sublist we have the string before - and the string after -
+#' 9. x_var_df now is a list where each sublist are going to be the datasets 
+#' identified by strings names in each sublists of split_names_possibilites
+#' 10. in each sublist x_var_df we filter only the intersections available  
+#' in  possibilities_intesect
+#' 11. In each sublist we calculate the conditional probability
+#' 12. If table = "conditional frequency" 
+#' 12.1 name_var_df is a list with the conditional names.
+#' 12.2 With the help of the first walk2 we define a new variable COND in each 
+#' dataset of the list x_var_df as the names in name_var_df and with flatten_df
+#' we convert the list in dataset
+#' 12.3 the final walk convert the probabilities in percent format
+#' 13 If table = "conditional expectation"
+#' 13.1 from the x_var_df before the first if, for each sublist we calculate the
+#' conditional mean, conditional variance and the conditional standard deviation
+#' 13.2 As equal to the first if, we use reference_name_cond to obtain a  list with
+#' the conditional names and assing them as a new variable in each dataset of 
+#' x_var_df and with flatten_df to convert the list to dataframe
+#' 13.3 With the last walk convert the conditional calculus in percent format
+#' @param df dataset
+#' @param num_int_var analysis applied to ONE numeric or integer variable
+#' @param distribution we obtained this parameter with the function 
+#' help_distribution with the argument distribution = TRUE
+#' @param table  based on this parameter we select the type of analysis
 #' @return
+#' if table = "conditional frequency" we bring the dataset of the probability 
+#' of a particular combinations of levels of the dataset based on the other 
+#' possible combinations of levels if and only if the intersection of the numeric 
+#' variable in one combination and the other exist.
+#' if table = "conditional expectation" we bring the dataset of the probability 
+#' of a particular combinations of levels of the dataset based on the other 
+#' possible combinations of levels if and only if the intersection of the numeric 
+#' variable in one combination and the other exist.
+#' 
 #MALE_3 <- distribution[[1]][,PASSENGERID]
 #MALE_3_prop <- MALE_3/sum(MALE_3)
 # MALE_3_df <- data.table(
@@ -737,72 +904,75 @@ conditional_stats <- function(df,
     possibilities_intesect[map(possibilities_intesect, length) > 0] %>% 
     unlist(.,recursive=FALSE)
   
-  # dfs of the names intersection posibilities 
-  split_names_possibilites <- str_split(string = names(possibilities_intesect),
-                                        pattern = "-")
-  x_var_df <- map(1:length(split_names_possibilites), function(i){
-    each <- split_names_possibilites[[i]]
+  if(is.null(possibilities_intesect)) result <- 
+    data.table(RESULT = "No intersection in any combination of levels")
+  else{
+    split_names_possibilites <- str_split(string = names(possibilities_intesect),
+                                          pattern = "-")
+    x_var_df <- map(1:length(split_names_possibilites), function(i){
+      each <- split_names_possibilites[[i]]
+      
+      map(each, ~pluck(x_var_df, .x)) %>% 
+        set_names(each)
+    }) 
     
-    map(each, ~pluck(x_var_df, .x)) %>% 
-      set_names(each)
-  }) 
-  
-  x_var_df <- map(1:length(x_var_df), function(i){
-    map(x_var_df[[i]], 
-        ~.x[get(num_int_var) %in% possibilities_intesect[[i]]])
-  }) %>% set_names(names(possibilities_intesect))
-  
-  walk(x_var_df, function(i){
-    walk(i, ~.x[,PROB_COND:=PROB/(.x[,sum(PROB, na.rm = TRUE)])])
-  })
-  
-  if(table == "conditional frequency"){
-    name_var_df <- reference_name_cond(df = x_var_df)
-    walk2(x_var_df, name_var_df, function(x,y){
-      walk2(x,y, ~.x[,COND:=.y])
+    x_var_df <- map(1:length(x_var_df), function(i){
+      map(x_var_df[[i]], 
+          ~.x[get(num_int_var) %in% possibilities_intesect[[i]]])
+    }) %>% set_names(names(possibilities_intesect))
+    
+    walk(x_var_df, function(i){
+      walk(i, ~.x[,PROB_COND:=PROB/(.x[,sum(PROB, na.rm = TRUE)])])
     })
-    x_var_df <- x_var_df %>% flatten_df()
-    walk(c("PROB","PROB_COND"), 
-         ~x_var_df[,(.x):=scales::percent(x = get(.x))])
-    result <- x_var_df
+    
+    if(table == "conditional frequency"){
+      name_var_df <- reference_name_cond(df = x_var_df)
+      walk2(x_var_df, name_var_df, function(x,y){
+        walk2(x,y, ~.x[,COND:=.y])
+      })
+      x_var_df <- x_var_df %>% flatten_df()
+      walk(c("PROB","PROB_COND"), 
+           ~x_var_df[,(.x):=scales::percent(x = get(.x))])
+      result <- x_var_df
+    }
+    
+    else if(table == "conditional expectation"){
+      cond_stats <- map(copy(x_var_df), function(i){
+        map(i, ~data.table(COND_MEAN = .x[,get(num_int_var)*PROB_COND] %>% 
+                             sum(na.rm = TRUE),
+                           COND_MEAN_CUAD = .x[,(get(num_int_var)^2)*PROB_COND] %>% 
+                             sum(na.rm = TRUE)) %>% 
+              .[,COND_VAR:=COND_MEAN_CUAD-(COND_MEAN^2)] %>% 
+              .[,COND_SD:=sqrt(COND_VAR)] %>% 
+              .[,"COND_MEAN_CUAD":=NULL])
+      })
+      name_var_cond_stats <- reference_name_cond(df = cond_stats)
+      walk2(cond_stats, name_var_cond_stats, function(x,y){
+        walk2(x,y, ~.x[,(num_int_var):=.y])
+      })
+      cond_stats <- cond_stats %>% flatten_df()
+      round_vars <- str_subset(string = names(cond_stats), pattern = "COND[_].*")
+      walk(round_vars, ~cond_stats[,(.x):=round(get(.x), digits = 2)])
+      result <- cond_stats
+    }else NULL
   }
-  
-  else if(table == "conditional expectation"){
-    cond_stats <- map(copy(x_var_df), function(i){
-      map(i, ~data.table(COND_MEAN = .x[,get(num_int_var)*PROB_COND] %>% 
-                           sum(na.rm = TRUE),
-                         COND_MEAN_CUAD = .x[,(get(num_int_var)^2)*PROB_COND] %>% 
-                           sum(na.rm = TRUE)) %>% 
-            .[,COND_VAR:=COND_MEAN_CUAD-(COND_MEAN^2)] %>% 
-            .[,COND_SD:=sqrt(COND_VAR)] %>% 
-            .[,"COND_MEAN_CUAD":=NULL])
-    })
-    name_var_cond_stats <- reference_name_cond(df = cond_stats)
-    walk2(cond_stats, name_var_cond_stats, function(x,y){
-      walk2(x,y, ~.x[,(num_int_var):=.y])
-    })
-    cond_stats <- cond_stats %>% flatten_df()
-    round_vars <- str_subset(string = names(cond_stats), pattern = "COND[_].*")
-    walk(round_vars, ~cond_stats[,(.x):=round(get(.x), digits = 2)])
-    result <- cond_stats
-  }else NULL
   result
 }
 # result <- conditional_stats(df = df,
 #                   num_int_var = num_int_var,
-#                   distribution = distribution,
+#                   distribution = dfs,
 #                   table = "conditional frequency")
 # result <- conditional_stats(df = df,
 #                             num_int_var = num_int_var,
-#                             distribution = distribution,
+#                             distribution = dfs,
 #                             table = "conditional expectation")
-# map(x_var_df, ~names(.x))
+#map(x_var_df, ~names(.x))
 # names(possibilities_intesect)
 
 #' @SUBFUNCTION
-#' @description 
-#' @param
-#' @return
+#' @description iteration over a list with conditional datasets as sublists
+#' @param df
+#' @return list of the names of the possible conditionals
 reference_name_cond <- function(df){
   
   map(1:length(df), function(i){

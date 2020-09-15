@@ -1,6 +1,6 @@
 sidebar <- dashboardSidebar(
   
-  # Add a search option -----------------------------------------------------
+  # Add a search option 
   sidebarSearchForm(
     textId = "searchtext",
     buttonId = "searchbutton",
@@ -8,42 +8,42 @@ sidebar <- dashboardSidebar(
     icon = icon("search")
   ),
   
-  # Add the labels of the sidebar -------------------------------------------
+  # Add the labels of the sidebar 
   sidebarMenu(
     id = "leftbar",
     
-    # Presentation Page -------------------------------------------------------
+    # Presentation Page 
     menuItem(
       text = "Presentation",
       tabName = "presentation",
       icon = icon(name = "vector-square")
     ),
     
-    # Raw Data ----------------------------------------------------------------
+    # Raw Data 
     menuItem(
       text = "Raw Data",
       tabName = "rawdata",
       icon = icon(name = "table")
     ),
     
-    # Descriptive Statistics options ------------------------------------------
+    # Descriptive Statistics options 
     menuItem(
       text = "General Inforamation",
       icon = icon(name = "calculator", class = "fas fa-calculator", 
                   lib = "font-awesome"),
-      # General Reports
+      ##General Reports
       menuSubItem(
         text = "General reports",
         tabName = "GR",
         icon = icon("angle-right")),
-      # Descriptive Statistics 
+      ##Descriptive Statistics 
       menuSubItem(
         text = "Descriptive Statistics",
         tabName = "DS",
         icon = icon("angle-right"))
     ),
     
-    # Statistical Distributions options ---------------------------------------
+    # Statistical Distributions options 
     menuItem(
       text = "Statistical Distributions",
       icon = icon(name = "chart-bar", class = "fas fa-chart-bar", 
@@ -60,7 +60,7 @@ sidebar <- dashboardSidebar(
         icon = icon("angle-right"))
     ),
     
-    # Unsupervised learning options -------------------------------------------
+    # Unsupervised learning options 
     menuItem(
       text = "Unsupervised Learning",
       icon = icon("brain"),
@@ -76,7 +76,7 @@ sidebar <- dashboardSidebar(
         icon = icon("angle-right"))
     ),
     
-    # Supervised learning options ---------------------------------------------
+    # Supervised learning options 
     menuItem(
       text = "Supervised Learning",
       icon = icon("code-branch"),

@@ -35,6 +35,8 @@
 
 # library(chartjs) donout chart for comparing numeric variable based on levels
 # http://tutuchan.github.io/chartjs/index.html
+#htmlwidgets
+#https://github.com/ramnathv/htmlwidgets
 
 # . -----------------------------------------------------------------------
 

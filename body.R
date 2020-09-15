@@ -4,54 +4,54 @@ body <- dashboardBody(
   
   withMathJax(), #Allow math latex formulas in the body
   
-  # Add the theme to the paper ----------------------------------------------
+  # Add the theme to the paper 
   dashboardthemes:: shinyDashboardThemes(
     theme = "grey_dark"
   ),
   
-  # Taggle sidebar information ----------------------------------------------
+  # Taggle sidebar information 
   tabItems(
     
-    # Presentation Page -------------------------------------------------------
+    # Presentation Page 
     tabItem(
       tabName = "presentation",
       HomemenuInput_body("menu")
     ),
-    # Raw Data ----------------------------------------------------------------
+    # Raw Data 
     tabItem(
       tabName = "rawdata",
       raw_dataInput_body("raw_data")
     ),
-    # General Information -----------------------------------------------------
-    # # General Report --------------------------------------------------------
+    # General Information 
+    ## General Report 
     tabItem(
       tabName = "GR",
       reportInput_body("pull_report")
     ),
-    # # Descriptive Statistics ------------------------------------------------
+    ## Descriptive Statistics 
     tabItem(
       tabName = "DS",
-      "Modify 2"
+      descriptStatsInput_body("pull_desc_stats")
     ),
-    # Statistical Distributions -----------------------------------------------
-    # # Discrete Distributions ------------------------------------------------
+    # Statistical Distributions 
+    # # Discrete Distributions 
     tabItem(
       tabName = "SDiscrete",
       discrete_distInput_body("discrete_distributions")
     ),
-    # # Continous Distributions -----------------------------------------------
+    # # Continous Distributions 
     tabItem(tabName = "SDcontinous",
             "Modify2.1"
     ),
     
-    # Unsupervised Learning ---------------------------------------------------
+    # Unsupervised Learning 
     tabItem(tabName = "ULclustering",
             "Modify3"
     ),
     tabItem(tabName = "ULpca",
             "Modify3.1"
     ),
-    # Supervised Learning -----------------------------------------------------
+    # Supervised Learning 
     tabItem(tabName = "SLregression",
             "Modify4"
     ),
@@ -64,7 +64,7 @@ body <- dashboardBody(
     tabItem(tabName = "SLtrees",
             "Modify4.3"
     ),
-    # Forecast ----------------------------------------------------------------
+    # Forecast 
     tabItem(tabName = "forecast",
             "Modify5"
     )

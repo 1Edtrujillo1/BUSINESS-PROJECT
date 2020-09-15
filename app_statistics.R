@@ -10,8 +10,9 @@ map(c("shiny", "shinydashboard", "dashboardthemes", "shinydashboardPlus",
       "sparkline", "moments", "chartjs"), 
     require, character.only = TRUE)
 
-source("INFORMATION/1.MENU/reactive_menu.R")
 source("INFORMATION/utils.R")
+
+source("INFORMATION/1.MENU/reactive_menu.R")
 
 map(
   str_c("INFORMATION/2.RAW_DATA", 
@@ -34,7 +35,8 @@ map(
 
 map(
   str_c("INFORMATION/3.1.DESCRIPTIVE_STATISTICS",
-        c("descriptive_statistics.R"), sep = "/"),
+        c("descriptive_statistics.R", "reactive_descriptive_statistics.R"), 
+        sep = "/"),
   source
 )
 
@@ -54,31 +56,34 @@ ui <- dashboardPagePlus(header = header,  sidebar = sidebar,
 # Define server -----------------------------------------------------------
 server <- function(input, output) {
   
-  options(shiny.maxRequestSize=100*1024^2) #accept files of MB bigger
+  options(shiny.maxRequestSize=100*1024^2) # accept files of MB bigger
   
-  # Sever of the header -----------------------------------------------------
+  # Sever of the header
   notifications <- callModule(module = NotificationmenuOutput, 
                               id = "notifications")
   menu <- callModule(module = HomemenuOutput, 
                      id = "menu")
-  # Server of the Raw Data --------------------------------------------------
+  # Server of the Raw Data 
   raw_data <- callModule(module = raw_dataOutput, 
                          id = "raw_data")
   
-  # Server General Information ----------------------------------------------
-  # # Server of the General Report ------------------------------------------
+  # Server General Information 
+  ## Server of the General Report 
   pull_data_report <- callModule(module = pull_dataOutput,
                                  id = "pull_report")
   pull_report <- callModule(module = reportOutput,
                             id = "pull_report")
-  # # Server of Descriptive Statistics --------------------------------------
+  ## Server of Descriptive Statistics 
+  pull_data_desc_stats <- callModule(module = pull_dataOutput,
+                                     id = "pull_desc_stats")
+  pull_desc_stats <- callModule(module = descriptStatsOutput,
+                                id = "pull_desc_stats")
   
-  
-  # Server for Statistical Distributions ------------------------------------
-  # # Server for Discrete Random Variable ----------------------------------
+  # Server for Statistical Distributions 
+  # # Server for Discrete Random Variable 
   discrete_distributions <- callModule(module = discrete_distOutput, 
                                        id = "discrete_distributions")
-  # # Server for Continous Random Variable ----------------------------------
+  # # Server for Continous Random Variable 
   
   
   
