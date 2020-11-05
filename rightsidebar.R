@@ -49,15 +49,13 @@ rightsidebar <- rightSidebar(
     # Statistical Distributions 
     # # Discrete Distributions 
     conditionalPanel(condition = "input.leftbar == 'SDiscrete'",
-                     discrete_distInput_rightsidebar("discrete_distributions"),
+                     distributionInput_rightsidebar(id = "discrete_distributions")
     ),
     # # Continous Distributions 
     conditionalPanel(condition = "input.leftbar == 'SDcontinous'",
-                     selectInput(inputId = "continous", label = "Distribution",
-                                 choices = c("Exponential", "Normal", "Gamma", 
-                                             "Log-Normal", "Beta", "Weibull", "Chi-Square"),
-                                 multiple = FALSE)
+                     distributionInput_rightsidebar(id = "continous_distributions")
     )
+    
   )
   
 )

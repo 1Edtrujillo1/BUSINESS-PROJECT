@@ -26,6 +26,36 @@ list_of_lists <- function(no_sublists, element_sublists){
 `%between%` <- function(x,rng) x >= rng[1] & x <= rng[2]
 # c(4,6,7,9,10,13,15) %between% 6:9
 
+#' @description
+#' @param
+#' @return
+general_sequence <- function(from, to){
+  tryCatch({
+    length.out <- (to-from) %>% round(digits = 1)
+    
+    if(length.out == 1){
+      numb_ceros <- str_extract(string = min(from, to), 
+                                pattern = "(?<=[.])(.*?)(?=(?![0])[:digit:]+)") %>% #all after . and before the digit different from 0
+        str_length()
+      
+      by_argument <- str_c(".", str_pad(string = 1, 
+                                        width = numb_ceros, 
+                                        side = "left", pad = "0")) %>% as.numeric()
+      
+      result <- seq(from = from, to = to, by = by_argument)
+    }else result <- seq(from = from, to = to)
+    result
+  }, error = function(e){"need to define the correct parameters"})
+}
+# general_sequence(from = qbeta(0.99999,
+#                               shape1 = scale,
+#                               shape2 = shape,
+#                               lower.tail = FALSE),
+#                  to = qbeta(0.99999,
+#                             shape1 = scale,
+#                             shape2 = shape,
+#                             lower.tail = TRUE))
+
 #' @description to a previous plot we add specific ggplot 2 functions to create
 #' a final design to the plot
 #' @param plot defined plot
@@ -54,7 +84,7 @@ design_plot <- function(plot){
 #' @return the previous table in DT format
 desing_DT <- function(df,...){
   datatable(data = df, 
-            style = 'bootstrap',
+            style = 'bootstrap', #theme of the datatable
             filter = list(position = 'top', clear = FALSE),
             options = list(
               autoWidth = TRUE,

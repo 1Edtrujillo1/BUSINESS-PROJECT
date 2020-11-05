@@ -37,11 +37,12 @@ body <- dashboardBody(
     # # Discrete Distributions 
     tabItem(
       tabName = "SDiscrete",
-      discrete_distInput_body("discrete_distributions")
+      distributionInput_body(id = "discrete_distributions")
     ),
     # # Continous Distributions 
-    tabItem(tabName = "SDcontinous",
-            "Modify2.1"
+    tabItem(
+      tabName = "SDcontinous",
+      distributionInput_body(id = "continous_distributions")
     ),
     
     # Unsupervised Learning 

@@ -1,0 +1,332 @@
+{
+    "VALUES": {
+        "x": "\\(x\\)",
+        "a": "\\(a\\)",
+        "b": "b: \\( (a \\leq b) \\)"
+    },
+    "SUMMARY": [
+        "\\(\\mu = E(X) =",
+        "\\(\\sigma = SD(X) =",
+        "\\(\\sigma^2 = Var(X) ="
+    ],
+    "TAIL": {
+        "GENERAL": {
+            "under_x": [
+                "\\(P(X \\leq \\)",
+                "\\() \\)",
+                "\\(= \\)"
+            ],
+            "above_x": [
+                "\\(P(X > \\)",
+                "\\() \\)",
+                "\\(= \\)"
+            ],
+            "interval": [
+                "\\(P(\\)",
+                "\\(\\leq X \\leq \\)",
+                "\\() \\)",
+                "\\(= \\)"
+            ]
+        },
+        "Z": {
+            "under_x": [
+                "\\(P(Z \\leq \\)",
+                "\\() \\)",
+                "\\(= \\)"
+            ],
+            "above_x": [
+                "\\(P(Z > \\)",
+                "\\() \\)",
+                "\\(= \\)"
+            ],
+            "interval": [
+                "\\(P(\\)",
+                "\\(\\leq Z \\leq \\)",
+                "\\() \\)",
+                "\\(= \\)"
+            ]
+        }
+    },
+    "DISCRETE": {
+        "BINOMIAL": {
+            "DISTRIBUTION": [
+                "\\(X \\sim Bin(n = \\)",
+                "\\(p = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = P(X = x) = \\binom{n}{x}p^x(1-p)^{n-x}$$",
+            "PARAMETERS": "\\( x = 0, 1, \\dots, n\\) and \\( 0 \\leq p \\leq 1 \\)",
+            "MEAN": "np = \\)",
+            "SD": "\\sqrt{np(1-p)} = \\)",
+            "VAR": "np(1-p) = \\)",
+            "ARGUMENTS": {
+                "NUMBER OF TRIALS": "\\(n\\)",
+                "PROBABILITY OF SUCCESS": "\\(p\\)"
+            }
+        },
+        "HYPERGEOMETRIC": {
+            "DISTRIBUTION": [
+                "\\(X \\sim HG(n = \\)",
+                "\\(N = \\)",
+                "\\(M = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = P(X = x) = \\dfrac{\\binom{M}{x} \\binom{N-M}{n-x}}{\\binom{N}{n}}$$",
+            "PARAMETERS": "\\( x = 0, 1, \\dots , n\\) , \\( x \\leq M \\) and \\( n - x \\leq N - M \\)",
+            "MEAN": "n\\dfrac{M}{N} = \\)",
+            "SD": "\\sqrt{n\\dfrac{M}{N}\\Big(1 - \\dfrac{M}{N}\\Big)\\Big(\\dfrac{N-n}{N-1}\\Big)} = \\)",
+            "VAR": "n\\dfrac{M}{N}\\Big(1 - \\dfrac{M}{N}\\Big)\\Big(\\dfrac{N-n}{N-1}\\Big) =  \\)",
+            "ARGUMENTS": {
+                "SAMPLE SIZE": "\\(n\\)",
+                "TOTAL NUMBER OF OBJECTS": "\\(N\\)",
+                "NUMBER OF SUCCESSES": "\\(M\\)"
+            }
+        },
+        "POISSON": {
+            "DISTRIBUTION": [
+                "\\(X \\sim Pois(\\lambda = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = P(X = x) = \\dfrac{e^{-\\lambda}\\lambda^x}{x!}$$",
+            "PARAMETERS": "\\( x = 0, 1, 2, \\dots\\) and \\( \\lambda > 0 \\)",
+            "MEAN": "\\lambda = \\)",
+            "SD": "\\sqrt{\\lambda} = \\)",
+            "VAR": "\\lambda = \\)",
+            "ARGUMENTS": {
+                "RATE": "\\(\\lambda\\)"
+            }
+        },
+        "GEOMETRIC1": {
+            "DISTRIBUTION": [
+                "\\(X \\sim Geom(p = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = P(X=x) = (1-p)^x p$$",
+            "PARAMETERS": "\\( x = 0, 1, 2, \\dots \\) and \\(0 < p \\leq 1 \\)",
+            "MEAN": "\\dfrac{1-p}{p} = \\)",
+            "SD": "\\sqrt{\\dfrac{1-p}{p^2}} = \\)",
+            "VAR": "\\dfrac{1-p}{p^2} = \\)",
+            "ARGUMENTS": {
+                "PROBABILITY OF SUCCESS": "\\(p\\)"
+            }
+        },
+        "GEOMETRIC2": {
+            "DISTRIBUTION": [
+                "\\(X \\sim Geom(p = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = P(X=x) = (1-p)^{x-1} p$$",
+            "PARAMETERS": "\\(x = 1, 2, \\dots \\) and \\(0 < p \\leq 1 \\)",
+            "MEAN": "\\dfrac{1}{p} = \\)",
+            "SD": "\\sqrt{\\dfrac{1-p}{p^2}} = \\)",
+            "VAR": "\\dfrac{1-p}{p^2} = \\)",
+            "ARGUMENTS": {
+                "PROBABILITY OF SUCCESS": "\\(p\\)"
+            }
+        },
+        "NEGATIVE1": {
+            "DISTRIBUTION": [
+                "\\(X \\sim NG(r = \\)",
+                "\\(p = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = P(X = x) = \\binom{x+r-1}{r-1} (1-p)^x p^r$$",
+            "PARAMETERS": "\\( x = 0, 1, 2, \\dots, r = 1, 2, \\dots \\) and \\( 0 < p \\leq 1 \\)",
+            "MEAN": "\\dfrac{r(1-p)}{p} = \\)",
+            "SD": "\\sqrt{\\dfrac{r(1-p)}{p^2}} = \\)",
+            "VAR": "\\dfrac{r(1-p)}{p^2} = \\)",
+            "ARGUMENTS": {
+                "NUMBER OF SUCCESSES": "\\(r\\)",
+                "PROBABILITY OF SUCCESS": "\\(p\\)"
+            }
+        },
+        "NEGATIVE2": {
+            "DISTRIBUTION": [
+                "\\(X \\sim NG(r = \\)",
+                "\\(p = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = P(X = x) = \\binom{x-1}{r-1}p^r (1-p)^{x-r}$$",
+            "PARAMETERS": "\\(x = r, r+1, \\dots \\) and \\( 0 < p \\leq 1 \\)",
+            "MEAN": "\\dfrac{r}{p} = \\)",
+            "SD": "\\sqrt{\\dfrac{r(1-p)}{p^2}} = \\)",
+            "VAR": "\\dfrac{r(1-p)}{p^2} = \\)",
+            "ARGUMENTS": {
+                "NUMBER OF SUCCESSES": "\\(r\\)",
+                "PROBABILITY OF SUCCESS": "\\(p\\)"
+            }
+        }
+    },
+    "CONTINOUS": {
+        "EXPONENTIAL": {
+            "DISTRIBUTION": [
+                "\\(X \\sim \\exp(\\lambda = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = \\lambda e^{-\\lambda x}$$",
+            "PARAMETERS": "\\( x > 0, \\lambda > 0\\)",
+            "MEAN": "\\dfrac{1}{\\lambda} = \\)",
+            "SD": "\\dfrac{1}{\\lambda} = \\)",
+            "VAR": "\\dfrac{1}{\\lambda^2} = \\)",
+            "ARGUMENTS": {
+                "RATE": "\\(\\lambda\\)"
+            }
+        },
+        "GAMMA": {
+            "DISTRIBUTION": [
+                "\\(X \\sim Gamma(\\alpha = \\)",
+                "\\(\\beta = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = \\dfrac{\\beta^\\alpha}{\\Gamma(\\alpha)} x^{\\alpha -1}e^{-\\beta x}$$",
+            "PARAMETERS": "\\( x > 0, \\alpha > 0, \\beta > 0\\)",
+            "MEAN": "\\dfrac{\\alpha}{\\beta} = \\)",
+            "SD": "\\sqrt{\\dfrac{\\alpha}{\\beta^2}} = \\)",
+            "VAR": "\\dfrac{\\alpha}{\\beta^2} = \\)",
+            "ARGUMENTS": {
+                "SHAPE": "\\(\\alpha\\)",
+                "RATE": "\\(\\beta\\)"
+            }
+        },
+        "CHI_SQUARE": {
+            "DISTRIBUTION": [
+                "\\(X \\sim \\chi^2(df = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = \\dfrac{1}{2^{df/2}\\Gamma\\big(\\dfrac{df}{2}\\big)} x^{df/2 - 1} e^{-x/2}$$",
+            "PARAMETERS": "\\( x > 0, df > 0\\)",
+            "MEAN": "df = \\)",
+            "SD": "\\sqrt{2df} = \\)",
+            "VAR": "2df = \\)",
+            "ARGUMENTS": {
+                "DEGREES OF FREEDOM": "\\(df\\)"
+            }
+        },
+        "BETA": {
+            "DISTRIBUTION": [
+                "\\(X \\sim Beta(\\alpha = \\)",
+                "\\(\\beta = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = \\dfrac{\\Gamma(\\alpha + \\beta)}{\\Gamma(\\alpha)\\Gamma(\\beta)} x^{\\alpha-1} (1 - x)^{\\beta - 1}$$",
+            "PARAMETERS": "\\( 0 \\leq x \\leq 1, \\alpha > 0, \\beta > 0\\)",
+            "MEAN": "\\dfrac{\\alpha}{\\alpha + \\beta} = \\)",
+            "SD": "\\sqrt{\\dfrac{\\alpha\\beta}{(\\alpha + \\beta)^2(\\alpha + \\beta+1)}} = \\)",
+            "VAR": "\\dfrac{\\alpha\\beta}{(\\alpha + \\beta)^2(\\alpha + \\beta+1)} = \\)",
+            "ARGUMENTS": {
+                "SCALE": "\\(\\alpha\\)",
+                "SHAPE": "\\(\\beta\\)"
+            }
+        },
+        "WEIBULL": {
+            "DISTRIBUTION": [
+                "\\(X \\sim Weibull(\\alpha = \\)",
+                "\\(\\beta = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = \\dfrac{\\alpha}{\\beta} \\big(\\dfrac{x}{\\beta}\\big)^{\\alpha-1} e^{-(x / \\beta)^\\alpha}$$",
+            "PARAMETERS": "\\( x > 0, \\alpha >0, \\beta > 0\\)",
+            "MEAN": "\\beta\\Gamma\\big(1 + \\dfrac{1}{\\alpha}\\big) = \\)",
+            "SD": "\\sqrt{\\beta^2\\Big(\\Gamma\\big(1 + \\dfrac{2}{\\alpha}\\big) - \\Gamma\\big(1 + \\dfrac{1}{\\alpha}\\big)^2\\Big)} = \\)",
+            "VAR": "\\beta^2\\Big(\\Gamma\\big(1 + \\dfrac{2}{\\alpha}\\big) - \\Gamma\\big(1 + \\dfrac{1}{\\alpha}\\big)^2\\Big) = \\)",
+            "ARGUMENTS": {
+                "SHAPE": "\\(\\alpha\\)",
+                "SCALE": "\\(\\beta\\)"
+            }
+        },
+        "STUDENT": {
+            "DISTRIBUTION": [
+                "\\(X \\sim St(df = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = \\dfrac{\\Gamma \\big(\\dfrac{df+1}{2}\\big)}{\\sqrt{df \\pi} \\Gamma \\big(\\dfrac{df}{2}\\big)} \\Big(1 + \\dfrac{x^2}{df}\\Big)^{-\\dfrac{df+1}{2}}$$",
+            "PARAMETERS": "\\( -\\infty < x < \\infty, df > 0\\)",
+            "MEAN": "\\)",
+            "SD": "\\sqrt{\\dfrac{df}{df - 2}} = \\)",
+            "VAR": "\\dfrac{df}{df-2} = \\)",
+            "ARGUMENTS": {
+                "DEGREES OF FREEDOM": "\\(df\\)"
+            }
+        },
+        "LOGISTIC": {
+            "DISTRIBUTION": [
+                "\\(X \\sim Logi(\\mu = \\)",
+                "\\(s = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = \\dfrac{e^{-\\dfrac{x-\\mu}{s}}}{s\\Bigg(1 + e^{-\\dfrac{x - \\mu}{s}}\\Bigg)^2}$$",
+            "PARAMETERS": "\\( -\\infty < x < \\infty, -\\infty < \\mu < \\infty, s > 0\\)",
+            "MEAN": "\\)",
+            "SD": "\\sqrt{\\dfrac{s^2\\pi^2}{3}} = \\)",
+            "VAR": "\\dfrac{s^2\\pi^2}{3} = \\)",
+            "ARGUMENTS": {
+                "LOCATION": "\\(\\mu\\)",
+                "SCALE": "\\(s\\)"
+            }
+        },
+        "NORMAL": {
+            "DISTRIBUTION": [
+                "\\(X \\sim \\mathcal{N}(\\mu = \\)",
+                "\\(\\sigma = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = \\dfrac{1}{\\sqrt{2\\pi \\sigma^2}}e^{-\\dfrac{1}{2\\sigma^2}(x-\\mu)^2}$$",
+            "PARAMETERS": "\\( -\\infty < x < \\infty, -\\infty < \\mu < \\infty, \\sigma > 0\\)",
+            "MEAN": "\\)",
+            "SD": "\\)",
+            "VAR": "\\)",
+            "ARGUMENTS": {
+                "MEAN": "\\(\\mu\\)",
+                "STANDARD DEVIATION": "\\(\\sigma\\)"
+            }
+        },
+        "LOG_NORMAL": {
+            "DISTRIBUTION": [
+                "\\(X \\sim Lognormal(\\mu = \\)",
+                "\\(\\sigma = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = \\dfrac{1}{x\\sqrt{2\\pi \\sigma^2}}e^{-\\dfrac{1}{2\\sigma^2}(ln(x)-\\mu)^2}$$",
+            "PARAMETERS": "\\( x > 0, -\\infty < \\mu < \\infty, \\sigma > 0\\)",
+            "MEAN": "e^{\\mu + \\dfrac{\\sigma^2}{2}} = \\)",
+            "SD": "\\sqrt{(e^{\\sigma^2} - 1)e^{2\\mu + \\sigma^2}} = \\)",
+            "VAR": "(e^{\\sigma^2} - 1)e^{2\\mu + \\sigma^2} = \\)",
+            "ARGUMENTS": {
+                "MEAN": "\\(\\mu\\)",
+                "STANDARD DEVIATION": "\\(\\sigma\\)"
+            }
+        },
+        "CAUCHY": {
+            "DISTRIBUTION": [
+                "\\(X \\sim Cauchy(x_0 = \\)",
+                "\\(\\gamma = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = \\dfrac{1}{\\pi\\gamma \\Big[ 1 + \\big(\\dfrac{x - x_0}{\\gamma}\\big)^2\\Big]}$$",
+            "PARAMETERS": "\\( -\\infty < x_0 < \\infty, -\\infty < x < \\infty, y > 0\\)",
+            "MEAN": "Undefined\\)",
+            "SD": "Undefined\\)",
+            "VAR": "Undefined \\)",
+            "ARGUMENTS": {
+                "LOCATION": "\\(x_0\\)",
+                "SCALE": "\\(\\gamma\\)"
+            }
+        },
+        "FISHER": {
+            "DISTRIBUTION": [
+                "\\(X \\sim F(df_1 = \\)",
+                "\\(df_2 = \\)",
+                "\\()\\)"
+            ],
+            "FUNCTION": "$$f(x) = \\dfrac{\\Gamma\\big(\\dfrac{df_1 + df_2}{2}\\big) \\big(\\dfrac{df_1}{df_2}\\big)^{\\dfrac{df_1}{2}}x^{\\dfrac{df_1}{2}-1}}{\\Gamma\\big(\\dfrac{df_1}{2}\\big)\\Gamma\\big(\\dfrac{df_2}{2}\\big)\\big(1 + \\dfrac{df_1 x}{df_2}\\big)^{\\dfrac{df_1 + df_2}{2}}}$$",
+            "PARAMETERS": "\\( df_1, df_2 > 0, x \\geq 0\\)",
+            "MEAN": "\\dfrac{df_2}{df_2 - 2} = \\)",
+            "SD": "\\sqrt{\\dfrac{2df^2_2(df_1 + df_2 - 2)}{df_1(df_2 - 2)^2(df_2 - 4)}} = \\)",
+            "VAR": "\\dfrac{2df^2_2(df_1 + df_2 - 2)}{df_1(df_2 - 2)^2(df_2 - 4)} = \\)",
+            "ARGUMENTS": {
+                "DEGREES OF FREEDOM": "\\(df_1\\)",
+                "DEGREES OF FREEDOM2": "\\(df_2\\)"
+            }
+        }
+    }
+}

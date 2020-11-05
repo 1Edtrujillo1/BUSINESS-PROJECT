@@ -7,7 +7,7 @@ map(c("shiny", "shinydashboard", "dashboardthemes", "shinydashboardPlus",
       "shinyWidgets", "mixdist","DT", "jsonlite", "data.table", "dplyr", 
       "bit64", "stringr", "scales", "ggplot2", "plotly", "haven", "readxl", 
       "lubridate", "tidyr", "DBI", "odbc", "glue", "arrangements", "formattable",
-      "sparkline", "moments", "chartjs"), 
+      "sparkline", "moments", "chartjs", "labelVector"), 
     require, character.only = TRUE)
 
 source("INFORMATION/utils.R")
@@ -42,8 +42,9 @@ map(
 
 map(
   str_c("INFORMATION/4.STATISTICAL_DISTRIBUTIONS",
-        c("statistical_distributions.R", "reactive_discretedistr.R",
-          "reactive_statisical_distributions.R"), sep = "/"),
+        c("statistical_distribution.R", "dictionary_distribution.R",
+          "utils_distribution.R", "reactive_statistical_distribution.R"), 
+        sep = "/"),
   source)
 
 map(c("header.R", "body.R", "sidebar.R", "rightsidebar.R"), 
@@ -81,9 +82,13 @@ server <- function(input, output) {
   
   # Server for Statistical Distributions 
   # # Server for Discrete Random Variable 
-  discrete_distributions <- callModule(module = discrete_distOutput, 
-                                       id = "discrete_distributions")
+  discrete_distributions <- callModule(module = distributionOutput, 
+                                       id = "discrete_distributions",
+                                       distribution_type = "DISCRETE")
   # # Server for Continous Random Variable 
+  continous_distributions <- callModule(module = distributionOutput,
+                                        id = "continous_distributions",
+                                        distribution_type = "CONTINOUS")
   
   
   
